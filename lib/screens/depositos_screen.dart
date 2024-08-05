@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -215,7 +217,6 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                     .where((e) => e.name == entidad)
                     .toList()
                     .firstOrNull;
-
                 return Card(
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -227,14 +228,14 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                             Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: CircleAvatar(
-                                backgroundImage: AssetImage(entidadLogo?.logo ??
-                                    'assets/account_balance.png'),
+                                /* backgroundImage: AssetImage(entidadLogo?.logo ??
+                                    'assets/account_balance.png'),*/
+                                backgroundImage:
+                                    File(entidadLogo!.logo).existsSync()
+                                        ? FileImage(File(entidadLogo.logo))
+                                        : const AssetImage(
+                                            'assets/account_balance.png'),
                               ),
-                              /*child: CircleAvatar(
-                                child: entidadLogo == null
-                                    ? const Icon(Icons.account_balance)
-                                    : Image.asset(entidadLogo.logo),
-                              ),*/
                             ),
                             Text(
                               entidad,

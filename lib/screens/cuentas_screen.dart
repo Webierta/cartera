@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carteradb/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -262,6 +264,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                   .where((e) => e.name == entidad)
                   .toList()
                   .firstOrNull;
+
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -272,8 +275,13 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: CircleAvatar(
-                              backgroundImage: AssetImage(entidadLogo?.logo ??
-                                  'assets/account_balance.png'),
+                              /*backgroundImage: AssetImage(entidadLogo?.logo ??
+                                  'assets/account_balance.png'),*/
+                              backgroundImage:
+                                  File(entidadLogo!.logo).existsSync()
+                                      ? FileImage(File(entidadLogo.logo))
+                                      : const AssetImage(
+                                          'assets/account_balance.png'),
                             ),
                           ),
                           Text(

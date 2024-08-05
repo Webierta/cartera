@@ -65,6 +65,7 @@ class _EntidadAddScreenState extends ConsumerState<EntidadAddScreen> {
       final XFile? image =
           await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return;
+      logo.text = image.path;
       final File imageTemp = File(image.path);
       final bytes = await imageTemp.readAsBytes();
       final docsDir = await getApplicationDocumentsDirectory();
@@ -72,9 +73,10 @@ class _EntidadAddScreenState extends ConsumerState<EntidadAddScreen> {
       String imagePath = '${docsDir.path}/carteraDB/$nombreEntidad.png';
       final file = File(imagePath);
       await file.writeAsBytes(bytes);
-      setState(() {
-        logo.text = file.path;
-      });
+
+      // setState(() {
+      //logo.text = file.path;
+      //});
     } catch (e) {
       return;
     }

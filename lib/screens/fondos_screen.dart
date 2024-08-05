@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -244,7 +246,6 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
           }
         }
       }
-
       setState(() {
         entidadCapital[entidad] = capital;
       });
@@ -350,15 +351,14 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: CircleAvatar(
-                              backgroundImage: AssetImage(entidadLogo?.logo ??
-                                  'assets/account_balance.png'),
+                              /*backgroundImage: AssetImage(entidadLogo?.logo ??
+                                  'assets/account_balance.png'),*/
+                              backgroundImage:
+                                  File(entidadLogo!.logo).existsSync()
+                                      ? FileImage(File(entidadLogo.logo))
+                                      : const AssetImage(
+                                          'assets/account_balance.png'),
                             ),
-                            /*child: CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              child: entidadLogo == null
-                                  ? const Icon(Icons.account_balance)
-                                  : Image.asset(entidadLogo.logo),
-                            ),*/
                           ),
                           Text(
                             entidad,

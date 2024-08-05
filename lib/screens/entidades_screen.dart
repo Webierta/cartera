@@ -151,17 +151,6 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
     return false;
   }
 
-  Widget getImage(EntidadData entidad) {
-    if (entidad.logo.isEmpty) {
-      return const Placeholder();
-    }
-    try {
-      return Image.file(File(entidad.logo));
-    } catch (e) {
-      return const Placeholder();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -235,18 +224,9 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                         SizedBox(
                           width: 180,
                           height: 180,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EntidadAddScreen(editEntidad: entidad),
-                                ),
-                              );
-                            },
-                            child: getImage(entidad),
-                          ),
+                          child: File(entidad.logo).existsSync()
+                              ? Image.file(File(entidad.logo))
+                              : Image.asset('assets/account_balance.png'),
                         ),
                         Expanded(
                           child: FittedBox(
@@ -266,11 +246,24 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
-                                            entidad.name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .displaySmall,
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EntidadAddScreen(
+                                                          editEntidad: entidad),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              entidad.name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displaySmall!
+                                                  .copyWith(color: Colors.blue),
+                                            ),
                                           ),
                                         ],
                                       ),

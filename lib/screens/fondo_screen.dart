@@ -247,42 +247,44 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Card(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Chip(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.inversePrimary,
-                            label: Column(
-                              children: [
-                                const Text('SUSCRIPCIÓN'),
-                                Text(
-                                  'Part.: ${widget.fondo.participaciones}',
-                                ),
-                              ],
+                  Expanded(
+                    child: Card(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Chip(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              label: Column(
+                                children: [
+                                  const Text('SUSCRIPCIÓN'),
+                                  Text(
+                                    'Part.: ${widget.fondo.participaciones}',
+                                  ),
+                                ],
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                            const SizedBox(height: 4),
+                            Text(
+                              FechaUtil.dateToString(
+                                  date: widget.fondo.fechaInicial),
+                              style: const TextStyle(fontSize: 14),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            FechaUtil.dateToString(
-                                date: widget.fondo.fechaInicial),
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            'V.L.: ${NumberUtil.decimal(widget.fondo.valorInicial)}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            'Inversión: ${NumberUtil.currency(widget.fondo.participaciones * widget.fondo.valorInicial)}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
+                            Text(
+                              'V.L.: ${NumberUtil.decimal(widget.fondo.valorInicial)}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              'Inversión: ${NumberUtil.currency(widget.fondo.participaciones * widget.fondo.valorInicial)}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -292,8 +294,13 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            '${tiempo.$1} ${tiempo.$2}',
-                            style: const TextStyle(fontSize: 16),
+                            NumberUtil.currency(rendimiento),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  rendimiento > 0 ? Colors.green : Colors.red,
+                            ),
                           ),
                           const Divider(
                             indent: 60,
@@ -306,49 +313,50 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
-                            'Resultado:\n${NumberUtil.currency(rendimiento)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                    Card(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Chip(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              label: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                child: Text('EVOLUCIÓN'),
+                    Expanded(
+                      child: Card(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Chip(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                label: Column(
+                                  children: [
+                                    const Text('EVOLUCIÓN'),
+                                    Text(
+                                      '${tiempo.$1} ${tiempo.$2}',
+                                      //style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
+                              const SizedBox(height: 4),
+                              Text(
+                                FechaUtil.dateToString(
+                                    date: valoresFondo.first.fecha),
+                                style: const TextStyle(fontSize: 14),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              FechaUtil.dateToString(
-                                  date: valoresFondo.first.fecha),
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'V.L.: ${NumberUtil.decimal(valoresFondo.first.valor)}',
-                              // valoresFondo.first.valor
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'Capital: ${NumberUtil.currency(capital)}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
+                              Text(
+                                'V.L.: ${NumberUtil.decimal(valoresFondo.first.valor)}',
+                                // valoresFondo.first.valor
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              Text(
+                                'Capital: ${NumberUtil.currency(capital)}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     )
