@@ -7,7 +7,9 @@ import '../services/app_database.dart';
 import '../services/tablas.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
+import '../utils/stats.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/dia_calendario.dart';
 import '../widgets/menu.dart';
 import 'fondo_add_screen.dart';
 import 'fondos_screen.dart';
@@ -23,16 +25,29 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
   late AppDatabase database;
   TextEditingController fechaController = TextEditingController();
   TextEditingController precioController = TextEditingController();
-  double capital = 0;
-  double rendimiento = 0;
-  double tae = 0;
-  (int, String) tiempo = (0, '');
+  TextEditingController participacionesController = TextEditingController();
+
+  bool isOperacion = false;
+  bool opSuscripcion = true;
+
   List<ValoresFondoData> valoresFondo = [];
+
+  Stats stats = const Stats([]); //late Stats stats;
+  double inversion = 0;
+  double resultado = 0;
+  double rendimiento = 0;
+  double rentabilidad = 0;
+  double rentAnual = 0;
+  double twr = 0;
+  double tae = 0;
+  double mwr = 0;
+  double mwrAcum = 0;
 
   @override
   void initState() {
+    //stats = Stats(valoresFondo);
     database = ref.read(AppDatabase.provider);
-    getIndices();
+    setValores();
     super.initState();
   }
 
@@ -40,43 +55,60 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
   void dispose() {
     fechaController.dispose();
     precioController.dispose();
+    participacionesController.dispose();
     super.dispose();
   }
 
-  Future<void> getIndices() async {
+  Future<void> setValores() async {
     final valores = await database.getValores(widget.fondo.id);
-    setState(() {
-      valoresFondo = valores;
-    });
+    setState(() => valoresFondo = valores);
     if (valoresFondo.isEmpty) {
-      setState(() {
-        capital = 0;
-        //capital = widget.fondo.participaciones * widget.fondo.valorInicial;
-        rendimiento = 0;
-        tae = 0;
-        tiempo = (0, '');
-      });
+      resetStats();
     } else {
-      String tiempoString = 'días';
-      int tiempoInt =
-          valoresFondo.first.fecha.difference(widget.fondo.fechaInicial).inDays;
-      if (tiempoInt > 60) {
-        tiempoInt = tiempoInt ~/ 30;
-        tiempoString = 'meses';
-        if (tiempoInt > 25) {
-          tiempoInt = tiempoInt ~/ 12;
-          tiempoString = 'años';
-        }
+      List<ValoresFondoData> operaciones =
+          valoresFondo.where((data) => data.tipo != null).toList();
+      if (operaciones.isNotEmpty) {
+        calculateStats();
+      } else {
+        resetStats();
       }
-      setState(() {
-        tiempo = (tiempoInt, tiempoString);
-        capital = widget.fondo.participaciones * valoresFondo.first.valor;
-        rendimiento = capital -
-            (widget.fondo.participaciones * widget.fondo.valorInicial);
-        tae = rendimiento /
-            (widget.fondo.participaciones * widget.fondo.valorInicial);
-      });
     }
+  }
+
+  void resetStats() {
+    setState(() {
+      stats = const Stats([]);
+      inversion = 0;
+      resultado = 0;
+      rendimiento = 0;
+      rentabilidad = 0;
+      rentAnual = 0;
+      twr = 0;
+      tae = 0;
+      mwr = 0;
+      mwrAcum = 0;
+    });
+  }
+
+  void calculateStats() {
+    setState(() {
+      stats = Stats(valoresFondo);
+      inversion = stats.inversion() ?? 0;
+      resultado = stats.resultado() ?? 0;
+      rendimiento = stats.balance() ?? 0;
+      rentabilidad = stats.rentabilidad() ?? 0;
+      if (stats.rentabilidad() != null) {
+        rentAnual = stats.anualizar(rentabilidad) ?? 0;
+      }
+      twr = stats.twr() ?? 0;
+      if (stats.twr() != null) {
+        tae = stats.anualizar(twr) ?? 0;
+      }
+      mwr = stats.mwr() ?? 0;
+      if (stats.mwr() != null) {
+        mwrAcum = stats.mwrAcum(mwr) ?? 0;
+      }
+    });
   }
 
   Widget childAvatar(Titular titular) {
@@ -90,13 +122,33 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
         precioController.text.trim().isEmpty) {
       return;
     }
-    var newValor = ValoresFondoCompanion(
-      fondo: dr.Value(widget.fondo.id),
-      fecha: dr.Value(FechaUtil.stringToDate(fechaController.text)),
-      valor: dr.Value(double.tryParse(precioController.text) ?? 0),
-    );
-    await database.addValorFondo(newValor);
-    getIndices();
+    var fecha = FechaUtil.stringToDateHms(fechaController.text);
+    ValoresFondoCompanion newValor;
+    if (isOperacion) {
+      newValor = ValoresFondoCompanion(
+        fondo: dr.Value(widget.fondo.id),
+        fecha: dr.Value(fecha),
+        valor: dr.Value(double.tryParse(precioController.text) ?? 0),
+        participaciones:
+            dr.Value(double.tryParse(participacionesController.text)),
+        tipo: dr.Value(
+            opSuscripcion == true ? TipoOp.suscripcion : TipoOp.reembolso),
+      );
+    } else {
+      newValor = ValoresFondoCompanion(
+        fondo: dr.Value(widget.fondo.id),
+        fecha: dr.Value(fecha),
+        valor: dr.Value(double.tryParse(precioController.text) ?? 0),
+      );
+    }
+    final valoresByFecha =
+        await database.getValoresByFecha(widget.fondo.id, fecha);
+    if (valoresByFecha.isNotEmpty) {
+      await database.updateValor(valoresByFecha.first.id, newValor);
+    } else {
+      await database.addValorFondo(newValor);
+    }
+    setValores();
   }
 
   Future<void> update() async {
@@ -106,7 +158,8 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
     }
     //await database.addValores(valores);
     await database.addValorFondo(valores.first);
-    getIndices();
+    //getIndices();
+    setValores();
   }
 
   Future<void> updateHistorico() async {
@@ -136,13 +189,37 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
     if (valores == null || valores.isEmpty) {
       return;
     }
-    await database.addValores(valores);
-    getIndices();
+    await database.addValores(valores, widget.fondo.id);
+    setValores();
   }
 
-  Future<void> deleteValor(int idValor) async {
-    await database.deleteValor(idValor);
-    getIndices();
+  Future<void> deleteValor(ValoresFondoData valor) async {
+    await database.deleteValor(valor.id);
+    setValores();
+  }
+
+  Future<void> deleteOperacion(ValoresFondoData valor) async {
+    // ELIMINA OPERACION MANTENIENDO VALOR (UPDATE VALOR)
+    ValoresFondoCompanion updateValor = ValoresFondoCompanion(
+      fondo: dr.Value(valor.fondo),
+      fecha: dr.Value(valor.fecha),
+      valor: dr.Value(valor.valor),
+      participaciones: const dr.Value(null),
+      tipo: const dr.Value(null),
+    );
+    await database.updateValor(valor.id, updateValor);
+    setValores();
+  }
+
+  Future<void> limpiarValores() async {
+    final confirm = await ConfirmDialog.dialogBuilder(
+      context,
+      '¿Eliminar todos los valores de este Fondo, incluyendo las operaciones?',
+    );
+    if (confirm == true) {
+      await database.deleteValoresFondo(widget.fondo.id);
+      setValores();
+    }
   }
 
   Future<void> deleteFondo() async {
@@ -162,6 +239,38 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
       );
     }
   }
+
+  Text diferenciaValores(ValoresFondoData valor, [bool total = false]) {
+    bool isFirstValor = valoresFondo.length > (valoresFondo.indexOf(valor) + 1);
+    double dif = valor.valor - widget.fondo.valorInicial;
+    if (isFirstValor && total != true) {
+      dif = valor.valor - valoresFondo[valoresFondo.indexOf(valor) + 1].valor;
+    }
+    return Text(
+      NumberUtil.currency(dif),
+      textAlign: TextAlign.right,
+      style: TextStyle(
+        //fontSize: 16,
+        color: dif < 0 ? Colors.red : Colors.green,
+      ),
+    );
+  }
+
+  /*Text diferenciaInicio(ValoresFondoData valor) {
+    bool isFirstValor = valoresFondo.length > (valoresFondo.indexOf(valor) + 1);
+    double dif = valor.valor - widget.fondo.valorInicial;
+    if (isFirstValor) {
+      dif = valor.valor - valoresFondo[valoresFondo.indexOf(valor) + 1].valor;
+    }
+    return Text(
+      NumberUtil.currency(dif),
+      textAlign: TextAlign.right,
+      style: TextStyle(
+        //fontSize: 16,
+        color: dif < 0 ? Colors.red : Colors.green,
+      ),
+    );
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +307,8 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
             //shape: AppBox.roundBorder,
             itemBuilder: (ctx) => <PopupMenuItem<Enum>>[
               MenuItem.buildMenuItem(Menu.editar),
-              MenuItem.buildMenuItem(Menu.exportar),
+              MenuItem.buildMenuItem(Menu.exportar, divider: true),
+              MenuItem.buildMenuItem(Menu.limpiar),
               MenuItem.buildMenuItem(Menu.eliminar),
             ],
             onSelected: (item) async {
@@ -212,6 +322,8 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                 );
               } else if (item == Menu.exportar) {
                 // EXPORTAR
+              } else if (item == Menu.limpiar) {
+                limpiarValores();
               } else if (item == Menu.eliminar) {
                 deleteFondo();
               }
@@ -241,130 +353,264 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                 style: const TextStyle(fontSize: 16),
               ),
             ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Card(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Chip(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.inversePrimary,
-                              label: Column(
-                                children: [
-                                  const Text('SUSCRIPCIÓN'),
-                                  Text(
-                                    'Part.: ${widget.fondo.participaciones}',
-                                  ),
-                                ],
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              FechaUtil.dateToString(
-                                  date: widget.fondo.fechaInicial),
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'V.L.: ${NumberUtil.decimal(widget.fondo.valorInicial)}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'Inversión: ${NumberUtil.currency(widget.fondo.participaciones * widget.fondo.valorInicial)}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (valoresFondo.isNotEmpty) ...[
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            NumberUtil.currency(rendimiento),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  rendimiento > 0 ? Colors.green : Colors.red,
-                            ),
-                          ),
-                          const Divider(
-                            indent: 60,
-                            endIndent: 60,
-                          ),
-                          Text(
-                            'TAE: ${NumberUtil.porcentage(tae * 100)}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            const SizedBox(height: 10),
+            if (valoresFondo.isNotEmpty) ...[
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Expanded(
                       child: Card(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(14.0),
                           child: Column(
                             children: [
-                              Chip(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                label: Column(
-                                  children: [
-                                    const Text('EVOLUCIÓN'),
-                                    Text(
-                                      '${tiempo.$1} ${tiempo.$2}',
-                                      //style: const TextStyle(fontSize: 16),
+                              Text(
+                                'BALANCE',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Participaciones:'),
+                                  Text(NumberUtil.decimal(
+                                      stats.totalParticipaciones() ?? 0)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Inversión:'),
+                                  Text(NumberUtil.currency(inversion)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Resultado:'),
+                                  Text(NumberUtil.currency(resultado)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Rendimiento:'),
+                                  Text(
+                                    NumberUtil.currency(rendimiento),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: rendimiento < 0
+                                          ? Colors.red
+                                          : Colors.green,
                                     ),
-                                  ],
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                FechaUtil.dateToString(
-                                    date: valoresFondo.first.fecha),
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                'V.L.: ${NumberUtil.decimal(valoresFondo.first.valor)}',
-                                // valoresFondo.first.valor
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                'Capital: ${NumberUtil.currency(capital)}',
-                                style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
                       ),
-                    )
+                    ),
+                    Expanded(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                'RENTABILIDAD',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Rentabilidad Simple:'),
+                                  Text(NumberUtil.percentCompact(rentabilidad)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('TWR:'),
+                                  Text(NumberUtil.percentCompact(twr)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('MWR Acum:'),
+                                  Text(NumberUtil.percentCompact(mwrAcum)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Simple anual:'),
+                                  Text(NumberUtil.percentCompact(rentAnual)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('TWR TAE:'),
+                                  Text(NumberUtil.percentCompact(tae)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('MWR:'),
+                                  Text(NumberUtil.percentCompact(mwr)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-            const Divider(height: 20),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'EVOLUCIÓN',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 6,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      DiaCalendario(
+                                        epoch: FechaUtil.dateToEpoch(
+                                            valoresFondo.first.fecha),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              NumberUtil.currency(
+                                                  valoresFondo.first.valor),
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                diferenciaValores(
+                                                    valoresFondo.first),
+                                                const Text(' dif. diaria'),
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                diferenciaValores(
+                                                    valoresFondo.first, true),
+                                                const Text(' dif. inicio'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(flex: 1),
+                            Expanded(
+                              flex: 6,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Valor mínimo (${FechaUtil.epochToString(
+                                          stats.datePrecioMinimo() ?? 0,
+                                          formato: 'dd/MM/yy',
+                                        )}): ',
+                                      ),
+                                      Text(NumberUtil.currency(
+                                          stats.precioMinimo() ?? 0)),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          'Valor máximo (${FechaUtil.epochToString(
+                                        stats.datePrecioMaximo() ?? 0,
+                                        formato: 'dd/MM/yy',
+                                      )}): '),
+                                      Text(NumberUtil.currency(
+                                          stats.precioMaximo() ?? 0)),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text('Valor medio:'),
+                                      Text(NumberUtil.currency(
+                                          stats.precioMedio() ?? 0)),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text('Volatilidad:'),
+                                      Text(NumberUtil.decimal(
+                                          stats.volatilidad() ?? 0)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 40),
             StreamBuilder<List<ValoresFondoData>>(
               stream: database.getValoresFondo(widget.fondo.id),
               builder: (
@@ -372,10 +618,29 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                 AsyncSnapshot<List<ValoresFondoData>> snapshot,
               ) {
                 return snapshot.hasData
-                    ? HistoricoValores(
-                        valores: snapshot.data!,
-                        delete: deleteValor,
-                        fondo: widget.fondo,
+                    ? Column(
+                        children: [
+                          const Text('OPERACIONES'),
+                          HistoricoValores(
+                            valores: snapshot.data!
+                                .where((data) => data.tipo != null)
+                                .toList(),
+                            delete: deleteOperacion,
+                            fondo: widget.fondo,
+                            isOperacion: true,
+                          ),
+                          /*const Divider(
+                            height: 40,
+                            color: Colors.black,
+                          ),*/
+                          const SizedBox(height: 40),
+                          const Text('HISTÓRICO'),
+                          HistoricoValores(
+                            valores: snapshot.data!,
+                            delete: deleteValor,
+                            fondo: widget.fondo,
+                          ),
+                        ],
                       )
                     : const Center(child: CircularProgressIndicator());
               },
@@ -429,6 +694,38 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
               ),
             ),
             const SizedBox(width: 20),
+            if (isOperacion) ...[
+              Expanded(
+                child: TextField(
+                  controller: participacionesController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.add_shopping_cart),
+                    labelText: 'Part.',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Switch(
+                value: opSuscripcion,
+                onChanged: (bool value) {
+                  setState(() => opSuscripcion = value);
+                },
+                thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+                  (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return const Icon(Icons.add_shopping_cart);
+                    }
+                    return const Icon(Icons.currency_exchange);
+                  },
+                ),
+              ),
+            ],
+            IconButton(
+              onPressed: () {
+                setState(() => isOperacion = !isOperacion);
+              },
+              icon: const Icon(Icons.shopping_cart, size: 40),
+            ),
             IconButton(
               onPressed: addValor,
               icon: const Icon(Icons.add_to_photos, size: 40),
@@ -441,14 +738,17 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
 }
 
 class HistoricoValores extends StatelessWidget {
-  final Function(int) delete;
+  final Function(ValoresFondoData) delete;
   final List<ValoresFondoData> valores;
   final FondoData fondo;
+  final bool isOperacion;
+
   const HistoricoValores({
     super.key,
     required this.valores,
     required this.delete,
     required this.fondo,
+    this.isOperacion = false,
   });
 
   Text diferenciaValores(ValoresFondoData valor) {
@@ -478,7 +778,7 @@ class HistoricoValores extends StatelessWidget {
       separatorBuilder: (context, index) => const Divider(),
       itemCount: valores.length,
       itemBuilder: (context, index) {
-        final valor = valores[index];
+        ValoresFondoData valor = valores[index];
         /*if (index == valores.length - 1) {
           return ItemListView(
             index: index,
@@ -486,6 +786,9 @@ class HistoricoValores extends StatelessWidget {
             diferencia: diferenciaValores,
           );
         }*/
+        if (isOperacion) {
+          valor = valores.reversed.toList()[index];
+        }
         return Dismissible(
           key: ValueKey(valor.id),
           direction: DismissDirection.endToStart,
@@ -500,36 +803,60 @@ class HistoricoValores extends StatelessWidget {
             ),
             child: const Padding(
               padding: EdgeInsets.only(right: 20),
-              child: Icon(
-                Icons.delete,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.delete, color: Colors.white),
             ),
           ),
-          onDismissed: (direction) => delete(valor.id),
-          child: ItemListView(
-            index: index,
-            valoresLength: valores.length,
-            valor: valor,
-            diferencia: diferenciaValores,
-          ),
+          onDismissed: (direction) => delete(valor),
+          confirmDismiss: (direction) async {
+            if (valor.tipo != null && !isOperacion) {
+              return await ConfirmDialog.dialogBuilder(
+                context,
+                'Este valor tiene una operación asociada, '
+                ' ¿eliminarlo de todas formas?',
+              );
+            }
+            return true;
+          },
+          child: isOperacion
+              ? ListOperaciones(
+                  index: index,
+                  valor: valor,
+                )
+              : ListHistorico(
+                  index: index,
+                  valoresLength: valores.length,
+                  valor: valor,
+                  diferencia: diferenciaValores,
+                ),
         );
       },
     );
   }
 }
 
-class ItemListView extends StatelessWidget {
+class ListHistorico extends StatelessWidget {
   final int index;
   final int valoresLength;
   final ValoresFondoData valor;
   final Text Function(ValoresFondoData) diferencia;
-  const ItemListView(
-      {super.key,
-      required this.index,
-      required this.valoresLength,
-      required this.valor,
-      required this.diferencia});
+
+  const ListHistorico({
+    super.key,
+    required this.index,
+    required this.valoresLength,
+    required this.valor,
+    required this.diferencia,
+  });
+
+  Color getColor(BuildContext context, ValoresFondoData valor) {
+    if (valor.tipo == TipoOp.suscripcion) {
+      return const Color(0xFFA5D6A7);
+    }
+    if (valor.tipo == TipoOp.reembolso) {
+      return const Color(0xFFEF9A9A);
+    }
+    return Theme.of(context).colorScheme.primaryContainer;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -541,6 +868,7 @@ class ItemListView extends StatelessWidget {
           Expanded(
             flex: 1,
             child: CircleAvatar(
+              backgroundColor: getColor(context, valor),
               child: Text(
                 //'${index + 1}',
                 '${valoresLength - index}',
@@ -551,7 +879,10 @@ class ItemListView extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Text(
-              FechaUtil.dateToString(date: valor.fecha),
+              FechaUtil.dateToString(
+                date: valor.fecha,
+                formato: 'dd/MM/yy',
+              ),
               textAlign: TextAlign.right,
               style: const TextStyle(fontSize: 16),
             ),
@@ -567,6 +898,89 @@ class ItemListView extends StatelessWidget {
           Expanded(
             flex: 2,
             child: diferencia(valor),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ListOperaciones extends StatelessWidget {
+  final int index;
+  final ValoresFondoData valor;
+
+  const ListOperaciones({
+    super.key,
+    required this.index,
+    required this.valor,
+  });
+
+  Widget getIcon(BuildContext context, ValoresFondoData valor) {
+    if (valor.tipo == TipoOp.suscripcion) {
+      return const CircleAvatar(
+        backgroundColor: Color(0xFFA5D6A7),
+        child: Icon(Icons.add_shopping_cart),
+      );
+    }
+    if (valor.tipo == TipoOp.reembolso) {
+      return const CircleAvatar(
+        backgroundColor: Color(0xFFEF9A9A),
+        child: Icon(Icons.currency_exchange),
+      );
+    }
+    return const Icon(Icons.shopping_cart);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(
+            flex: 1,
+            /*child: Text(
+              '${valor.tipo?.name.toUpperCase()}',
+              style: const TextStyle(fontSize: 12),
+              maxLines: 1,
+            ),*/
+            child: getIcon(context, valor),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              FechaUtil.dateToString(
+                date: valor.fecha,
+                formato: 'dd/MM/yy',
+              ),
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              NumberUtil.decimal(valor.participaciones ?? 0),
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              NumberUtil.currency(valor.valor),
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              NumberUtil.currency((valor.participaciones ?? 0) * valor.valor),
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
         ],
       ),

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:carteradb/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/app_database.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
+import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import 'cartera_screen.dart';
 import 'cuenta_add_screen.dart';
@@ -275,13 +274,8 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: CircleAvatar(
-                              /*backgroundImage: AssetImage(entidadLogo?.logo ??
-                                  'assets/account_balance.png'),*/
                               backgroundImage:
-                                  File(entidadLogo!.logo).existsSync()
-                                      ? FileImage(File(entidadLogo.logo))
-                                      : const AssetImage(
-                                          'assets/account_balance.png'),
+                                  BackgroundImage.getImage(entidadLogo),
                             ),
                           ),
                           Text(

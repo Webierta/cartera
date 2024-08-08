@@ -46,12 +46,20 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     if (fechaController.text.isEmpty || precioController.text.isEmpty) {
       return;
     }
+    var fecha = FechaUtil.stringToDateHms(fechaController.text);
     var newSaldo = SaldosCuentaCompanion(
       cuenta: dr.Value(widget.cuenta.id),
-      fecha: dr.Value(FechaUtil.stringToDate(fechaController.text)),
+      fecha: dr.Value(fecha),
       saldo: dr.Value(double.tryParse(precioController.text) ?? 0),
     );
-    await database.addSaldoCuenta(newSaldo);
+
+    final saldosByFecha =
+        await database.getSaldosByFecha(widget.cuenta.id, fecha);
+    if (saldosByFecha.isNotEmpty) {
+      await database.updateSaldo(saldosByFecha.first.id, newSaldo);
+    } else {
+      await database.addSaldoCuenta(newSaldo);
+    }
   }
 
   Future<void> deleteSaldo(int idSaldo) async {

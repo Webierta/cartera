@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import 'background_image.dart';
 
 class InputEntidad extends ConsumerStatefulWidget {
   final TextEditingController entidadController;
@@ -52,7 +53,12 @@ class _InputEntidadState extends ConsumerState<InputEntidad> {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: AssetImage(e.logo),
+                            //backgroundImage: AssetImage(e.logo),
+                            /*backgroundImage: File(e.logo).existsSync()
+                                ? FileImage(File(e.logo))
+                                : const AssetImage(
+                                    'assets/account_balance.png'),*/
+                            backgroundImage: BackgroundImage.getImage(e),
                             //backgroundColor: Colors.transparent,
                           ),
                           const SizedBox(width: 10),

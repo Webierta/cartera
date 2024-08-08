@@ -48,7 +48,7 @@ class _CuentaAddScreenState extends ConsumerState<CuentaAddScreen> {
     setState(() => titular = newTitular);
   }
 
-  addCuenta() async {
+  Future<void> addCuenta() async {
     if (nombre.text.trim().isEmpty ||
         iban.text.trim().isEmpty ||
         tae.text.trim().isEmpty ||
@@ -60,10 +60,12 @@ class _CuentaAddScreenState extends ConsumerState<CuentaAddScreen> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
+
     final database = ref.read(AppDatabase.provider);
     var entidadesList = await database.allEntidades;
     EntidadData entidadSelect =
         entidadesList.firstWhere((e) => e.name == entidad.text);
+
     var newCuenta = CuentaCompanion(
       name: dr.Value(nombre.text),
       iban: dr.Value(iban.text),
@@ -71,6 +73,7 @@ class _CuentaAddScreenState extends ConsumerState<CuentaAddScreen> {
       titular:
           dr.Value(Titular.values.firstWhere((tit) => tit.name == titular)),
       entidad: dr.Value(entidadSelect.name),
+      //entidad: const dr.Value('FACTO'),
     );
     if (widget.editCuenta == null) {
       await database.addCuenta(newCuenta);

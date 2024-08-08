@@ -1952,8 +1952,21 @@ class $ValoresFondoTable extends ValoresFondo
   late final GeneratedColumn<double> valor = GeneratedColumn<double>(
       'valor', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _tipoMeta = const VerificationMeta('tipo');
   @override
-  List<GeneratedColumn> get $columns => [id, fondo, fecha, valor];
+  late final GeneratedColumnWithTypeConverter<TipoOp?, String> tipo =
+      GeneratedColumn<String>('tipo', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<TipoOp?>($ValoresFondoTable.$convertertipon);
+  static const VerificationMeta _participacionesMeta =
+      const VerificationMeta('participaciones');
+  @override
+  late final GeneratedColumn<double> participaciones = GeneratedColumn<double>(
+      'participaciones', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, fondo, fecha, valor, tipo, participaciones];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1983,6 +1996,13 @@ class $ValoresFondoTable extends ValoresFondo
     } else if (isInserting) {
       context.missing(_valorMeta);
     }
+    context.handle(_tipoMeta, const VerificationResult.success());
+    if (data.containsKey('participaciones')) {
+      context.handle(
+          _participacionesMeta,
+          participaciones.isAcceptableOrUnknown(
+              data['participaciones']!, _participacionesMeta));
+    }
     return context;
   }
 
@@ -2000,6 +2020,11 @@ class $ValoresFondoTable extends ValoresFondo
           .read(DriftSqlType.dateTime, data['${effectivePrefix}fecha'])!,
       valor: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}valor'])!,
+      tipo: $ValoresFondoTable.$convertertipon.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tipo'])),
+      participaciones: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}participaciones']),
     );
   }
 
@@ -2007,6 +2032,11 @@ class $ValoresFondoTable extends ValoresFondo
   $ValoresFondoTable createAlias(String alias) {
     return $ValoresFondoTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<TipoOp, String, String> $convertertipo =
+      const EnumNameConverter<TipoOp>(TipoOp.values);
+  static JsonTypeConverter2<TipoOp?, String?, String?> $convertertipon =
+      JsonTypeConverter2.asNullable($convertertipo);
 }
 
 class ValoresFondoData extends DataClass
@@ -2015,8 +2045,15 @@ class ValoresFondoData extends DataClass
   final int? fondo;
   final DateTime fecha;
   final double valor;
+  final TipoOp? tipo;
+  final double? participaciones;
   const ValoresFondoData(
-      {required this.id, this.fondo, required this.fecha, required this.valor});
+      {required this.id,
+      this.fondo,
+      required this.fecha,
+      required this.valor,
+      this.tipo,
+      this.participaciones});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2026,6 +2063,13 @@ class ValoresFondoData extends DataClass
     }
     map['fecha'] = Variable<DateTime>(fecha);
     map['valor'] = Variable<double>(valor);
+    if (!nullToAbsent || tipo != null) {
+      map['tipo'] =
+          Variable<String>($ValoresFondoTable.$convertertipon.toSql(tipo));
+    }
+    if (!nullToAbsent || participaciones != null) {
+      map['participaciones'] = Variable<double>(participaciones);
+    }
     return map;
   }
 
@@ -2036,6 +2080,10 @@ class ValoresFondoData extends DataClass
           fondo == null && nullToAbsent ? const Value.absent() : Value(fondo),
       fecha: Value(fecha),
       valor: Value(valor),
+      tipo: tipo == null && nullToAbsent ? const Value.absent() : Value(tipo),
+      participaciones: participaciones == null && nullToAbsent
+          ? const Value.absent()
+          : Value(participaciones),
     );
   }
 
@@ -2047,6 +2095,9 @@ class ValoresFondoData extends DataClass
       fondo: serializer.fromJson<int?>(json['fondo']),
       fecha: serializer.fromJson<DateTime>(json['fecha']),
       valor: serializer.fromJson<double>(json['valor']),
+      tipo: $ValoresFondoTable.$convertertipon
+          .fromJson(serializer.fromJson<String?>(json['tipo'])),
+      participaciones: serializer.fromJson<double?>(json['participaciones']),
     );
   }
   @override
@@ -2057,6 +2108,9 @@ class ValoresFondoData extends DataClass
       'fondo': serializer.toJson<int?>(fondo),
       'fecha': serializer.toJson<DateTime>(fecha),
       'valor': serializer.toJson<double>(valor),
+      'tipo': serializer
+          .toJson<String?>($ValoresFondoTable.$convertertipon.toJson(tipo)),
+      'participaciones': serializer.toJson<double?>(participaciones),
     };
   }
 
@@ -2064,12 +2118,18 @@ class ValoresFondoData extends DataClass
           {int? id,
           Value<int?> fondo = const Value.absent(),
           DateTime? fecha,
-          double? valor}) =>
+          double? valor,
+          Value<TipoOp?> tipo = const Value.absent(),
+          Value<double?> participaciones = const Value.absent()}) =>
       ValoresFondoData(
         id: id ?? this.id,
         fondo: fondo.present ? fondo.value : this.fondo,
         fecha: fecha ?? this.fecha,
         valor: valor ?? this.valor,
+        tipo: tipo.present ? tipo.value : this.tipo,
+        participaciones: participaciones.present
+            ? participaciones.value
+            : this.participaciones,
       );
   ValoresFondoData copyWithCompanion(ValoresFondoCompanion data) {
     return ValoresFondoData(
@@ -2077,6 +2137,10 @@ class ValoresFondoData extends DataClass
       fondo: data.fondo.present ? data.fondo.value : this.fondo,
       fecha: data.fecha.present ? data.fecha.value : this.fecha,
       valor: data.valor.present ? data.valor.value : this.valor,
+      tipo: data.tipo.present ? data.tipo.value : this.tipo,
+      participaciones: data.participaciones.present
+          ? data.participaciones.value
+          : this.participaciones,
     );
   }
 
@@ -2086,13 +2150,16 @@ class ValoresFondoData extends DataClass
           ..write('id: $id, ')
           ..write('fondo: $fondo, ')
           ..write('fecha: $fecha, ')
-          ..write('valor: $valor')
+          ..write('valor: $valor, ')
+          ..write('tipo: $tipo, ')
+          ..write('participaciones: $participaciones')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, fondo, fecha, valor);
+  int get hashCode =>
+      Object.hash(id, fondo, fecha, valor, tipo, participaciones);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2100,7 +2167,9 @@ class ValoresFondoData extends DataClass
           other.id == this.id &&
           other.fondo == this.fondo &&
           other.fecha == this.fecha &&
-          other.valor == this.valor);
+          other.valor == this.valor &&
+          other.tipo == this.tipo &&
+          other.participaciones == this.participaciones);
 }
 
 class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
@@ -2108,17 +2177,23 @@ class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
   final Value<int?> fondo;
   final Value<DateTime> fecha;
   final Value<double> valor;
+  final Value<TipoOp?> tipo;
+  final Value<double?> participaciones;
   const ValoresFondoCompanion({
     this.id = const Value.absent(),
     this.fondo = const Value.absent(),
     this.fecha = const Value.absent(),
     this.valor = const Value.absent(),
+    this.tipo = const Value.absent(),
+    this.participaciones = const Value.absent(),
   });
   ValoresFondoCompanion.insert({
     this.id = const Value.absent(),
     this.fondo = const Value.absent(),
     required DateTime fecha,
     required double valor,
+    this.tipo = const Value.absent(),
+    this.participaciones = const Value.absent(),
   })  : fecha = Value(fecha),
         valor = Value(valor);
   static Insertable<ValoresFondoData> custom({
@@ -2126,12 +2201,16 @@ class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
     Expression<int>? fondo,
     Expression<DateTime>? fecha,
     Expression<double>? valor,
+    Expression<String>? tipo,
+    Expression<double>? participaciones,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (fondo != null) 'fondo': fondo,
       if (fecha != null) 'fecha': fecha,
       if (valor != null) 'valor': valor,
+      if (tipo != null) 'tipo': tipo,
+      if (participaciones != null) 'participaciones': participaciones,
     });
   }
 
@@ -2139,12 +2218,16 @@ class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
       {Value<int>? id,
       Value<int?>? fondo,
       Value<DateTime>? fecha,
-      Value<double>? valor}) {
+      Value<double>? valor,
+      Value<TipoOp?>? tipo,
+      Value<double?>? participaciones}) {
     return ValoresFondoCompanion(
       id: id ?? this.id,
       fondo: fondo ?? this.fondo,
       fecha: fecha ?? this.fecha,
       valor: valor ?? this.valor,
+      tipo: tipo ?? this.tipo,
+      participaciones: participaciones ?? this.participaciones,
     );
   }
 
@@ -2163,6 +2246,13 @@ class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
     if (valor.present) {
       map['valor'] = Variable<double>(valor.value);
     }
+    if (tipo.present) {
+      map['tipo'] = Variable<String>(
+          $ValoresFondoTable.$convertertipon.toSql(tipo.value));
+    }
+    if (participaciones.present) {
+      map['participaciones'] = Variable<double>(participaciones.value);
+    }
     return map;
   }
 
@@ -2172,7 +2262,9 @@ class ValoresFondoCompanion extends UpdateCompanion<ValoresFondoData> {
           ..write('id: $id, ')
           ..write('fondo: $fondo, ')
           ..write('fecha: $fecha, ')
-          ..write('valor: $valor')
+          ..write('valor: $valor, ')
+          ..write('tipo: $tipo, ')
+          ..write('participaciones: $participaciones')
           ..write(')'))
         .toString();
   }
@@ -3401,6 +3493,8 @@ typedef $$ValoresFondoTableCreateCompanionBuilder = ValoresFondoCompanion
   Value<int?> fondo,
   required DateTime fecha,
   required double valor,
+  Value<TipoOp?> tipo,
+  Value<double?> participaciones,
 });
 typedef $$ValoresFondoTableUpdateCompanionBuilder = ValoresFondoCompanion
     Function({
@@ -3408,6 +3502,8 @@ typedef $$ValoresFondoTableUpdateCompanionBuilder = ValoresFondoCompanion
   Value<int?> fondo,
   Value<DateTime> fecha,
   Value<double> valor,
+  Value<TipoOp?> tipo,
+  Value<double?> participaciones,
 });
 
 class $$ValoresFondoTableTableManager extends RootTableManager<
@@ -3431,24 +3527,32 @@ class $$ValoresFondoTableTableManager extends RootTableManager<
             Value<int?> fondo = const Value.absent(),
             Value<DateTime> fecha = const Value.absent(),
             Value<double> valor = const Value.absent(),
+            Value<TipoOp?> tipo = const Value.absent(),
+            Value<double?> participaciones = const Value.absent(),
           }) =>
               ValoresFondoCompanion(
             id: id,
             fondo: fondo,
             fecha: fecha,
             valor: valor,
+            tipo: tipo,
+            participaciones: participaciones,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int?> fondo = const Value.absent(),
             required DateTime fecha,
             required double valor,
+            Value<TipoOp?> tipo = const Value.absent(),
+            Value<double?> participaciones = const Value.absent(),
           }) =>
               ValoresFondoCompanion.insert(
             id: id,
             fondo: fondo,
             fecha: fecha,
             valor: valor,
+            tipo: tipo,
+            participaciones: participaciones,
           ),
         ));
 }
@@ -3468,6 +3572,18 @@ class $$ValoresFondoTableFilterComposer
 
   ColumnFilters<double> get valor => $state.composableBuilder(
       column: $state.table.valor,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<TipoOp?, TipoOp, String> get tipo =>
+      $state.composableBuilder(
+          column: $state.table.tipo,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get participaciones => $state.composableBuilder(
+      column: $state.table.participaciones,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -3499,6 +3615,16 @@ class $$ValoresFondoTableOrderingComposer
 
   ColumnOrderings<double> get valor => $state.composableBuilder(
       column: $state.table.valor,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get tipo => $state.composableBuilder(
+      column: $state.table.tipo,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get participaciones => $state.composableBuilder(
+      column: $state.table.participaciones,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

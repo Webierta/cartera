@@ -4,6 +4,8 @@ enum TipoProducto { cuenta, deposito, fondo }
 
 enum Titular { jcv, rpp, ambos }
 
+enum TipoOp { suscripcion, reembolso }
+
 class Entidad extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
@@ -78,6 +80,8 @@ class ValoresFondo extends Table {
   IntColumn get fondo => integer().nullable().references(Fondo, #id)();
   DateTimeColumn get fecha => dateTime()();
   RealColumn get valor => real()();
+  TextColumn get tipo => textEnum<TipoOp>().nullable()();
+  RealColumn get participaciones => real().nullable()();
 }
 
 class Historico extends Table {

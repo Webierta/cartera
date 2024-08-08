@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
+import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/menu.dart';
 import 'cartera_screen.dart';
@@ -353,11 +352,14 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                             child: CircleAvatar(
                               /*backgroundImage: AssetImage(entidadLogo?.logo ??
                                   'assets/account_balance.png'),*/
+                              //backgroundImage: backgroundImage(entidadLogo),
                               backgroundImage:
+                                  BackgroundImage.getImage(entidadLogo),
+                              /*backgroundImage:
                                   File(entidadLogo!.logo).existsSync()
                                       ? FileImage(File(entidadLogo.logo))
                                       : const AssetImage(
-                                          'assets/account_balance.png'),
+                                          'assets/account_balance.png'),*/
                             ),
                           ),
                           Text(

@@ -14,7 +14,7 @@ class DbTransfer {
   init() async {
     Directory dir = await getApplicationDocumentsDirectory();
     _dirBackup ??=
-        await Directory('${dir.path}/carteraDB/').create(recursive: true);
+        await Directory('${dir.path}/carteraDB2/').create(recursive: true);
   }
 
   ///carteraDB/backup
@@ -22,7 +22,7 @@ class DbTransfer {
   static Future<String> getDbPath() async {
     Directory dir = await getApplicationDocumentsDirectory();
     Directory dirApp =
-        await Directory('${dir.path}/carteraDB').create(recursive: true);
+        await Directory('${dir.path}/carteraDB2').create(recursive: true);
     String fileName = 'cartera_db.sqlite';
     return join(dirApp.path, fileName);
   }

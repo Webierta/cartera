@@ -10,25 +10,35 @@ class DiaCalendario extends StatelessWidget {
   Widget build(BuildContext context) {
     //int dia = FechaUtil.epochToDate(epoch).day;
     String mesYear = FechaUtil.epochToString(epoch, formato: 'MMM yy');
-    return FittedBox(
-      fit: BoxFit.fill,
-      child: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
-        //mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            FechaUtil.epochToString(epoch, formato: 'dd'),
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 20, // 32
-              //fontWeight: FontWeight.bold,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+      ),
+      child: FittedBox(
+        fit: BoxFit.fill,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              color: Colors.red,
+              child: Text(
+                mesYear,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
-          ),
-          Text(
-            mesYear,
-            style: const TextStyle(color: Colors.black),
-          ),
-        ],
+            Text(
+              FechaUtil.epochToString(epoch, formato: 'dd'),
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 32, // 32
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

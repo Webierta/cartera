@@ -32,4 +32,10 @@ class FechaUtil {
   static DateTime stringToDate(String fecha) {
     return DateFormat('d/M/yyyy').parse(fecha);
   }
+
+  static DateTime stringToDateHms(String fecha) {
+    DateTime date = DateFormat('d/M/yyyy').parse(fecha);
+    return dateToDateHms(date);
+    //return DateFormat('d/M/yyyy').parse(fecha);
+  }
 }

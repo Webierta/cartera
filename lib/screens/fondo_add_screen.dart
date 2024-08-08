@@ -86,6 +86,7 @@ class _FondoAddScreenState extends ConsumerState<FondoAddScreen> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
+
     final database = ref.read(AppDatabase.provider);
     var entidadesList = await database.allEntidades;
     EntidadData entidadSelect =
@@ -95,14 +96,25 @@ class _FondoAddScreenState extends ConsumerState<FondoAddScreen> {
       isin: dr.Value(isin.text),
       participaciones:
           dr.Value(double.tryParse(participaciones.text.trim()) ?? 0),
-      fechaInicial: dr.Value(FechaUtil.stringToDate(fechaInicial.text.trim())),
+      fechaInicial:
+          dr.Value(FechaUtil.stringToDateHms(fechaInicial.text.trim())),
       valorInicial: dr.Value(double.tryParse(valorInicial.text.trim()) ?? 0),
       titular:
           dr.Value(Titular.values.firstWhere((tit) => tit.name == titular)),
       entidad: dr.Value(entidadSelect.name),
     );
+
     if (widget.editFondo == null) {
-      await database.addFondo(newFondo);
+      int id = await database.addFondo(newFondo);
+      var newValor = ValoresFondoCompanion(
+        fondo: dr.Value(id),
+        fecha: dr.Value(FechaUtil.stringToDateHms(fechaInicial.text.trim())),
+        valor: dr.Value(double.tryParse(valorInicial.text.trim()) ?? 0),
+        participaciones:
+            dr.Value(double.tryParse(participaciones.text.trim()) ?? 0),
+        tipo: const dr.Value(TipoOp.suscripcion),
+      );
+      await database.addValorFondo(newValor);
     } else {
       await database.updateFondo(widget.editFondo!.id, newFondo);
     }

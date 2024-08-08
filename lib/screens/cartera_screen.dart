@@ -82,7 +82,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     fechaController.text = FechaUtil.dateToString(date: DateTime.now());
     cuentasController.text = totalCuentas.toString();
     depositosController.text = totalDepositos.toString();
-    fondosController.text = totalFondos.toString();
+    fondosController.text = totalFondos.toStringAsFixed(2);
     await loadHistorico();
   }
 
@@ -189,7 +189,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
       return;
     }
     HistoricoCompanion newHistorico = HistoricoCompanion(
-      fecha: dr.Value(FechaUtil.stringToDate(fechaController.text.trim())),
+      fecha: dr.Value(FechaUtil.stringToDateHms(fechaController.text.trim())),
       totalCuentas:
           dr.Value(double.tryParse(cuentasController.text.trim()) ?? 0),
       totalDepositos:

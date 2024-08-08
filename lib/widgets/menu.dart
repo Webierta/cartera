@@ -4,7 +4,8 @@ enum Menu {
   exportar(Icons.save),
   importar(Icons.file_download),
   eliminar(Icons.delete_forever),
-  editar(Icons.edit);
+  editar(Icons.edit),
+  limpiar(Icons.cleaning_services);
   //info(Icons.info);
 
   final IconData icon;

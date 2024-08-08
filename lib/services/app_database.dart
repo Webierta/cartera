@@ -1,3 +1,15 @@
+/*
+https://medium.com/@tagizada.nicat/migration-with-flutter-drift-c9e21e905eeb
+dart run build_runner build
+
+UPDATE DATABASE VERSION
+dart run drift_dev schema dump lib/services/app_database.dart db_schemas
+  update table y upgrade version
+flutter packages pub run build_runner build — delete-conflicting-outputs
+dart run drift_dev schema dump lib/services/app_database.dart db_schemas
+dart run drift_dev schema steps db_schemas lib/db_migration.dart
+*/
+
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -54,7 +66,7 @@ class AppDatabase extends _$AppDatabase {
         .write(companion);
   }
 
-  Future<int> deleteEntidad(int id) async {
+  Future<int> deleteEntidad(int id) {
     return (delete(entidad)..where((tbl) => tbl.id.equals(id))).go();
   }
 
@@ -73,7 +85,7 @@ class AppDatabase extends _$AppDatabase {
     return (update(cuenta)..where((tbl) => tbl.id.equals(id))).write(companion);
   }
 
-  Future<int> deleteCuenta(int id) async {
+  Future<int> deleteCuenta(int id) {
     return (delete(cuenta)..where((tbl) => tbl.id.equals(id))).go();
   }
 
@@ -112,6 +124,13 @@ class AppDatabase extends _$AppDatabase {
         .getSingle();
   }
 
+  Future<List<SaldosCuentaData>> getSaldosByFecha(
+      int cuentaId, DateTime fecha) {
+    return (select(saldosCuenta)
+          ..where((s) => s.cuenta.equals(cuentaId) & s.fecha.equals(fecha)))
+        .get();
+  }
+
   Future<int> addSaldoCuenta(SaldosCuentaCompanion newSaldo) {
     return into(saldosCuenta).insert(newSaldo);
   }
@@ -121,11 +140,11 @@ class AppDatabase extends _$AppDatabase {
         .write(companion);
   }
 
-  Future<int> deleteSaldo(int id) async {
+  Future<int> deleteSaldo(int id) {
     return (delete(saldosCuenta)..where((tbl) => tbl.id.equals(id))).go();
   }
 
-  Future<int> deleteSaldosCuenta(int cuentaId) async {
+  Future<int> deleteSaldosCuenta(int cuentaId) {
     return (delete(saldosCuenta)..where((s) => s.cuenta.equals(cuentaId))).go();
   }
 
@@ -145,7 +164,7 @@ class AppDatabase extends _$AppDatabase {
         .write(companion);
   }
 
-  Future<int> deleteDeposito(int id) async {
+  Future<int> deleteDeposito(int id) {
     return (delete(deposito)..where((tbl) => tbl.id.equals(id))).go();
   }
 
@@ -164,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
     return (update(fondo)..where((tbl) => tbl.id.equals(id))).write(companion);
   }
 
-  Future<int> deleteFondo(int id) async {
+  Future<int> deleteFondo(int id) {
     return (delete(fondo)..where((tbl) => tbl.id.equals(id))).go();
   }
 
@@ -203,14 +222,32 @@ class AppDatabase extends _$AppDatabase {
         .getSingle();
   }
 
+  Future<List<ValoresFondoData>> getValoresByFecha(
+      int fondoId, DateTime fecha) {
+    return (select(valoresFondo)
+          ..where((v) => v.fondo.equals(fondoId) & v.fecha.equals(fecha)))
+        .get();
+  }
+
   Future<int> addValorFondo(ValoresFondoCompanion newValor) {
     return into(valoresFondo).insert(newValor);
   }
 
-  Future<void> addValores(List<ValoresFondoCompanion> valores) async {
-    await batch((batch) {
-      batch.insertAll(valoresFondo, valores);
-    });
+  Future<void> addValores(
+      List<ValoresFondoCompanion> valores, int fondoId) async {
+    //await batch((batch) {
+    //batch.insertAllOnConflictUpdate(valoresFondo, valores);
+    //batch.insertAll(valoresFondo, valores);
+    //});
+    for (final valor in valores) {
+      var valoresByFecha = await getValoresByFecha(fondoId, valor.fecha.value);
+      //insert<T, D>(table, row, onConflict: DoUpdate((_) => row));
+      if (valoresByFecha.isEmpty) {
+        await addValorFondo(valor);
+      } else {
+        await updateValor(valoresByFecha.first.id, valor);
+      }
+    }
   }
 
   Future<int> updateValor(int id, ValoresFondoCompanion companion) {
@@ -218,11 +255,11 @@ class AppDatabase extends _$AppDatabase {
         .write(companion);
   }
 
-  Future<int> deleteValor(int id) async {
+  Future<int> deleteValor(int id) {
     return (delete(valoresFondo)..where((tbl) => tbl.id.equals(id))).go();
   }
 
-  Future<int> deleteValoresFondo(int fondoId) async {
+  Future<int> deleteValoresFondo(int fondoId) {
     return (delete(valoresFondo)..where((v) => v.fondo.equals(fondoId))).go();
   }
 
@@ -262,7 +299,7 @@ class AppDatabase extends _$AppDatabase {
         .write(companion);
   }
 
-  Future<int> deleteHistorico(int id) async {
+  Future<int> deleteHistorico(int id) {
     return (delete(historico)..where((tbl) => tbl.id.equals(id))).go();
   }
 

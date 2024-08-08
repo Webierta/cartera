@@ -75,7 +75,7 @@ class _DepositoAddScreenState extends ConsumerState<DepositoAddScreen> {
     return 0;
   }
 
-  addDeposito() async {
+  Future<void> addDeposito() async {
     if (nombre.text.trim().isEmpty ||
         codigo.text.trim().isEmpty ||
         imposicion.text.trim().isEmpty ||
@@ -105,9 +105,9 @@ class _DepositoAddScreenState extends ConsumerState<DepositoAddScreen> {
       codigo: dr.Value(codigo.text),
       tae: dr.Value(double.tryParse(tae.text.trim()) ?? 0),
       imposicion: dr.Value(double.tryParse(imposicion.text.trim()) ?? 0),
-      inicio: dr.Value(FechaUtil.stringToDate(fechaInicio.text.trim())),
+      inicio: dr.Value(FechaUtil.stringToDateHms(fechaInicio.text.trim())),
       vencimiento:
-          dr.Value(FechaUtil.stringToDate(fechaVencimiento.text.trim())),
+          dr.Value(FechaUtil.stringToDateHms(fechaVencimiento.text.trim())),
       renovacion: dr.Value(renovacion),
       titular:
           dr.Value(Titular.values.firstWhere((tit) => tit.name == titular)),
