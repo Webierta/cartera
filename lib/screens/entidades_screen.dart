@@ -268,7 +268,7 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                                         ],
                                       ),
                                       Text(
-                                        entidad.bic,
+                                        entidad.bic ?? '',
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelLarge,
@@ -280,9 +280,9 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
                                         children: [
-                                          SelectableText(entidad.web),
-                                          SelectableText(entidad.phone),
-                                          SelectableText(entidad.email),
+                                          SelectableText(entidad.web ?? ''),
+                                          SelectableText(entidad.phone ?? ''),
+                                          SelectableText(entidad.email ?? ''),
                                         ],
                                       ),
                                     ],

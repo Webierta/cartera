@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/app_database.dart';
 import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
+import '../utils/stats.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/menu.dart';
@@ -124,95 +125,18 @@ class ListadoFondos extends ConsumerStatefulWidget {
 class _ListadoFondosState extends ConsumerState<ListadoFondos> {
   late AppDatabase database;
   double capitalTotal = 0;
+  double inversionTotal = 0;
+  double balanceTotal = 0;
   Set<String> entidadesSet = {};
-  Map<FondoData, ValoresFondoData> mapFondoValor = {};
-  Map<FondoData, double> mapFondoCapital = {};
   Map<String, double> entidadCapital = {};
   List<EntidadData> entidades = [];
-
-  double getInversion(FondoData fondo) {
-    return fondo.participaciones * fondo.valorInicial;
-  }
-
-  double getRendimiento(FondoData fondo) {
-    if (mapFondoCapital[fondo] == null) {
-      return 0;
-    }
-    return mapFondoCapital[fondo]! - getInversion(fondo);
-  }
-
-  double get totalInversion {
-    double inversion = 0;
-    for (var fondo in widget.fondos) {
-      inversion += getInversion(fondo);
-    }
-    return inversion;
-  }
-
-  double get totalRendimiento {
-    double rendimiento = 0;
-    for (var fondo in widget.fondos) {
-      rendimiento += getRendimiento(fondo);
-    }
-    return rendimiento;
-  }
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
-    getCapitalTotal();
     getEntidadesSet();
-    //getEntidadCapital();
+    getTotalStats();
     super.initState();
-  }
-
-  Future<double> getCapital(FondoData fondo) async {
-    final valoresFondo = await database.getValores(fondo.id);
-    if (valoresFondo.isEmpty) {
-      setState(() {
-        mapFondoCapital[fondo] = 0;
-      });
-      //mapFondoCapital[fondo] = fondo.participaciones * fondo.valorInicial;
-      //mapFondoValor[fondo] = fondo.
-      //return fondo.participaciones * fondo.valorInicial;
-      return 0;
-    } else {
-      setState(() {
-        mapFondoCapital[fondo] =
-            fondo.participaciones * valoresFondo.first.valor;
-        mapFondoValor[fondo] = valoresFondo.first;
-      });
-
-      return fondo.participaciones * valoresFondo.first.valor;
-    }
-  }
-
-  Future<void> getCapitalTotal() async {
-    double capital = 0;
-    for (var fondo in widget.fondos) {
-      capital += await getCapital(fondo);
-    }
-    setState(() {
-      capitalTotal = capital;
-    });
-
-    /*List<double> lastValores = [];
-    for (var fondo in widget.fondos) {
-      final valoresFondo = await database.getValores(fondo.id);
-      if (valoresFondo.isEmpty) {
-        continue;
-      }
-      lastValores.add(valoresFondo.first.valor);
-    }
-    if (lastValores.isEmpty) {
-      setState(() {
-        capitalTotal = 0;
-      });
-      return;
-    }
-    setState(() {
-      capitalTotal = lastValores.reduce((value, element) => value + element);
-    });*/
   }
 
   Future<void> getEntidadesSet() async {
@@ -237,11 +161,13 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
       for (var fondo in widget.fondos) {
         if (fondo.entidad == entidad) {
           final valoresFondo = await database.getValores(fondo.id);
+          //Stats stats = Stats(valoresFondo);
+          //capital += stats.resultado() ?? 0;
           if (valoresFondo.isEmpty) {
             capital += 0;
           } else {
-            //capital += valoresFondo.first.valor;
-            capital += fondo.participaciones * valoresFondo.first.valor;
+            Stats stats = Stats(valoresFondo);
+            capital += stats.resultado() ?? 0;
           }
         }
       }
@@ -249,6 +175,24 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
         entidadCapital[entidad] = capital;
       });
     }
+  }
+
+  Future<void> getTotalStats() async {
+    double capital = 0;
+    double inversion = 0;
+    double balance = 0;
+    for (var fondo in widget.fondos) {
+      final valoresFondo = await database.getValores(fondo.id);
+      Stats stats = Stats(valoresFondo);
+      capital += stats.resultado() ?? 0;
+      inversion += stats.inversion() ?? 0;
+      balance += stats.balance() ?? 0;
+    }
+    setState(() {
+      capitalTotal = capital;
+      inversionTotal = inversion;
+      balanceTotal = balance;
+    });
   }
 
   @override
@@ -276,9 +220,7 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                       children: [
                         const Icon(Icons.shopping_cart),
                         const SizedBox(width: 10),
-                        Text(
-                          NumberUtil.currency(totalInversion),
-                        ),
+                        Text(NumberUtil.currency(inversionTotal)),
                       ],
                     ),
                     Row(
@@ -286,12 +228,10 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                         const Icon(Icons.exposure),
                         const SizedBox(width: 10),
                         Text(
-                          NumberUtil.currency(totalRendimiento),
+                          NumberUtil.currency(balanceTotal),
                           style: TextStyle(
                             //fontSize: 16,
-                            color: totalRendimiento < 0
-                                ? Colors.red
-                                : Colors.green,
+                            color: balanceTotal < 0 ? Colors.red : Colors.green,
                           ),
                         ),
                       ],
@@ -304,21 +244,6 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                     style: const TextStyle(fontSize: 22),
                   ),
                 ),
-                /*trailing: Chip(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  avatar: const Icon(
-                    Icons.exposure,
-                    size: 30,
-                  ),
-                  label: Text(
-                    '$totalRendimiento €',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: totalRendimiento < 0 ? Colors.red : Colors.green,
-                    ),
-                  ),
-                ),*/
               ),
             ),
           ],
@@ -350,16 +275,8 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: CircleAvatar(
-                              /*backgroundImage: AssetImage(entidadLogo?.logo ??
-                                  'assets/account_balance.png'),*/
-                              //backgroundImage: backgroundImage(entidadLogo),
                               backgroundImage:
                                   BackgroundImage.getImage(entidadLogo),
-                              /*backgroundImage:
-                                  File(entidadLogo!.logo).existsSync()
-                                      ? FileImage(File(entidadLogo.logo))
-                                      : const AssetImage(
-                                          'assets/account_balance.png'),*/
                             ),
                           ),
                           Text(
@@ -396,7 +313,6 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                                 ),
                               );
                             },
-                            //leading: CircleAvatar(child: Text(entidad[0])),
                             leading: CircleAvatar(
                               child: Text(fondo.name[0].toUpperCase(),
                                   style: Theme.of(context)
@@ -405,28 +321,29 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                             ),
                             title: Text(fondo.name),
                             subtitle: Text(fondo.isin ?? ''),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  /*fondo.valores.isEmpty
-                                      ? '0.0 €'
-                                      : NumberUtil.currency(
-                                          valores.last.precio *
-                                              fondo.participaciones),*/
-                                  //NumberUtil.currency(mapFondoValor[fondo]?.valor ?? 0),
-                                  NumberUtil.currency(
-                                      mapFondoCapital[fondo] ?? 0),
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                if (mapFondoValor[fondo]?.fecha != null)
-                                  Text(
-                                    FechaUtil.dateToString(
-                                      date: mapFondoValor[fondo]!.fecha,
-                                      formato: 'MMM yy',
-                                    ),
-                                  ),
-                              ],
+                            trailing: FutureBuilder(
+                              future: database.getValores(fondo.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final valoresFondo = snapshot.data!;
+                                  Stats stats = Stats(valoresFondo);
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                          NumberUtil.currency(
+                                              stats.resultado() ?? 0),
+                                          style: const TextStyle(fontSize: 14)),
+                                      if (valoresFondo.isNotEmpty)
+                                        Text(FechaUtil.dateToString(
+                                          date: valoresFondo.first.fecha,
+                                          formato: 'MMM yy',
+                                        )),
+                                    ],
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
                             ),
                           );
                         },

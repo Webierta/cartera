@@ -11,6 +11,7 @@ import '../services/tablas.dart';
 import '../utils/fecha_util.dart';
 import '../utils/local_storage.dart';
 import '../utils/number_util.dart';
+import '../utils/stats.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/dia_calendario.dart';
 import '../widgets/menu.dart';
@@ -152,11 +153,14 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   }
 
   Future<double> getCapital(FondoData fondo) async {
-    final valoresFondo = await database.getValores(fondo.id);
+    /*final valoresFondo = await database.getValores(fondo.id);
     if (valoresFondo.isEmpty) {
       return 0;
     }
-    return fondo.participaciones * valoresFondo.first.valor;
+    return fondo.participaciones * valoresFondo.first.valor;*/
+    final valoresFondo = await database.getValores(fondo.id);
+    Stats stats = Stats(valoresFondo);
+    return stats.resultado() ?? 0;
   }
 
   Future<void> getCapitalTotal() async {

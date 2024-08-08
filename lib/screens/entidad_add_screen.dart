@@ -31,12 +31,25 @@ class _EntidadAddScreenState extends ConsumerState<EntidadAddScreen> {
     database = ref.read(AppDatabase.provider);
     if (widget.editEntidad != null) {
       name.text = widget.editEntidad!.name;
-      bic.text = widget.editEntidad!.bic;
-      web.text = widget.editEntidad!.web;
-      phone.text = widget.editEntidad!.phone;
-      email.text = widget.editEntidad!.email;
+      //bic.text = widget.editEntidad!.bic;
+      //web.text = widget.editEntidad!.web;
+      //phone.text = widget.editEntidad!.phone;
+      //email.text = widget.editEntidad!.email;
       logo.text = widget.editEntidad!.logo;
     }
+    if (widget.editEntidad?.bic != null) {
+      bic.text = widget.editEntidad!.bic!;
+    }
+    if (widget.editEntidad?.web != null) {
+      web.text = widget.editEntidad!.web!;
+    }
+    if (widget.editEntidad?.phone != null) {
+      phone.text = widget.editEntidad!.phone!;
+    }
+    if (widget.editEntidad?.email != null) {
+      email.text = widget.editEntidad!.email!;
+    }
+
     super.initState();
   }
 

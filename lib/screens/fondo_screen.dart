@@ -250,27 +250,11 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
       NumberUtil.currency(dif),
       textAlign: TextAlign.right,
       style: TextStyle(
-        //fontSize: 16,
+        fontSize: 14,
         color: dif < 0 ? Colors.red : Colors.green,
       ),
     );
   }
-
-  /*Text diferenciaInicio(ValoresFondoData valor) {
-    bool isFirstValor = valoresFondo.length > (valoresFondo.indexOf(valor) + 1);
-    double dif = valor.valor - widget.fondo.valorInicial;
-    if (isFirstValor) {
-      dif = valor.valor - valoresFondo[valoresFondo.indexOf(valor) + 1].valor;
-    }
-    return Text(
-      NumberUtil.currency(dif),
-      textAlign: TextAlign.right,
-      style: TextStyle(
-        //fontSize: 16,
-        color: dif < 0 ? Colors.red : Colors.green,
-      ),
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -365,9 +349,18 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                           padding: const EdgeInsets.all(14.0),
                           child: Column(
                             children: [
-                              Text(
-                                'BALANCE',
-                                style: Theme.of(context).textTheme.titleMedium,
+                              Row(
+                                children: [
+                                  const CircleAvatar(
+                                    child: Icon(Icons.balance),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'BALANCE',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 10),
                               Row(
@@ -392,7 +385,13 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text('Resultado:'),
-                                  Text(NumberUtil.currency(resultado)),
+                                  Text(
+                                    NumberUtil.currency(resultado),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                               Row(
@@ -403,8 +402,8 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                   Text(
                                     NumberUtil.currency(rendimiento),
                                     style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      //fontWeight: FontWeight.bold,
                                       color: rendimiento < 0
                                           ? Colors.red
                                           : Colors.green,
@@ -423,9 +422,18 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                           padding: const EdgeInsets.all(14.0),
                           child: Column(
                             children: [
-                              Text(
-                                'RENTABILIDAD',
-                                style: Theme.of(context).textTheme.titleMedium,
+                              Row(
+                                children: [
+                                  const CircleAvatar(
+                                    child: Icon(Icons.percent),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'RENTABILIDAD',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 10),
                               Row(
@@ -452,6 +460,7 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                   Text(NumberUtil.percentCompact(mwrAcum)),
                                 ],
                               ),
+                              const Divider(),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -465,7 +474,13 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text('TWR TAE:'),
-                                  Text(NumberUtil.percentCompact(tae)),
+                                  Text(
+                                    NumberUtil.percentCompact(tae),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                               Row(
@@ -473,7 +488,13 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text('MWR:'),
-                                  Text(NumberUtil.percentCompact(mwr)),
+                                  Text(
+                                    NumberUtil.percentCompact(mwr),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -489,9 +510,17 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                   padding: const EdgeInsets.all(14.0),
                   child: Column(
                     children: [
-                      Text(
-                        'EVOLUCIÓN',
-                        style: Theme.of(context).textTheme.titleMedium,
+                      Row(
+                        children: [
+                          const CircleAvatar(
+                            child: Icon(Icons.timeline),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'EVOLUCIÓN',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       IntrinsicHeight(
@@ -500,106 +529,108 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                           children: [
                             Expanded(
                               flex: 6,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      DiaCalendario(
-                                        epoch: FechaUtil.dateToEpoch(
-                                            valoresFondo.first.fecha),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              NumberUtil.currency(
-                                                  valoresFondo.first.valor),
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                diferenciaValores(
-                                                    valoresFondo.first),
-                                                const Text(' dif. diaria'),
-                                              ],
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                diferenciaValores(
-                                                    valoresFondo.first, true),
-                                                const Text(' dif. inicio'),
-                                              ],
-                                            ),
-                                          ],
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 14),
+                                child: Column(
+                                  //crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Valor liquidativo:'),
+                                        Text(
+                                          NumberUtil.currency(
+                                              valoresFondo.first.valor),
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Dif. diaria:'),
+                                        diferenciaValores(valoresFondo.first),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Dif. desde inicio:'),
+                                        diferenciaValores(
+                                            valoresFondo.first, true),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            const Spacer(flex: 1),
+                            //const Spacer(flex: 1),
+                            Expanded(
+                              flex: 1,
+                              child: DiaCalendario(
+                                epoch: FechaUtil.dateToEpoch(
+                                    valoresFondo.first.fecha),
+                              ),
+                            ),
                             Expanded(
                               flex: 6,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Valor mínimo (${FechaUtil.epochToString(
-                                          stats.datePrecioMinimo() ?? 0,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 14),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Valor mínimo (${FechaUtil.epochToString(
+                                            stats.datePrecioMinimo() ?? 0,
+                                            formato: 'dd/MM/yy',
+                                          )}): ',
+                                        ),
+                                        Text(NumberUtil.currency(
+                                            stats.precioMinimo() ?? 0)),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                            'Valor máximo (${FechaUtil.epochToString(
+                                          stats.datePrecioMaximo() ?? 0,
                                           formato: 'dd/MM/yy',
-                                        )}): ',
-                                      ),
-                                      Text(NumberUtil.currency(
-                                          stats.precioMinimo() ?? 0)),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                          'Valor máximo (${FechaUtil.epochToString(
-                                        stats.datePrecioMaximo() ?? 0,
-                                        formato: 'dd/MM/yy',
-                                      )}): '),
-                                      Text(NumberUtil.currency(
-                                          stats.precioMaximo() ?? 0)),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text('Valor medio:'),
-                                      Text(NumberUtil.currency(
-                                          stats.precioMedio() ?? 0)),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text('Volatilidad:'),
-                                      Text(NumberUtil.decimal(
-                                          stats.volatilidad() ?? 0)),
-                                    ],
-                                  ),
-                                ],
+                                        )}): '),
+                                        Text(NumberUtil.currency(
+                                            stats.precioMaximo() ?? 0)),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Valor medio:'),
+                                        Text(NumberUtil.currency(
+                                            stats.precioMedio() ?? 0)),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Volatilidad:'),
+                                        Text(NumberUtil.decimal(
+                                            stats.volatilidad() ?? 0)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

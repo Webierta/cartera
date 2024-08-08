@@ -9,10 +9,10 @@ enum TipoOp { suscripcion, reembolso }
 class Entidad extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
-  TextColumn get bic => text()();
-  TextColumn get web => text()();
-  TextColumn get phone => text()();
-  TextColumn get email => text()();
+  TextColumn get bic => text().nullable()();
+  TextColumn get web => text().nullable()();
+  TextColumn get phone => text().nullable()();
+  TextColumn get email => text().nullable()();
   TextColumn get logo => text()();
 
 //@override

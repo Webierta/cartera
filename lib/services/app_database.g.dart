@@ -25,23 +25,23 @@ class $EntidadTable extends Entidad with TableInfo<$EntidadTable, EntidadData> {
   static const VerificationMeta _bicMeta = const VerificationMeta('bic');
   @override
   late final GeneratedColumn<String> bic = GeneratedColumn<String>(
-      'bic', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'bic', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _webMeta = const VerificationMeta('web');
   @override
   late final GeneratedColumn<String> web = GeneratedColumn<String>(
-      'web', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'web', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
   @override
   late final GeneratedColumn<String> phone = GeneratedColumn<String>(
-      'phone', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'phone', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
-      'email', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'email', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _logoMeta = const VerificationMeta('logo');
   @override
   late final GeneratedColumn<String> logo = GeneratedColumn<String>(
@@ -72,26 +72,18 @@ class $EntidadTable extends Entidad with TableInfo<$EntidadTable, EntidadData> {
     if (data.containsKey('bic')) {
       context.handle(
           _bicMeta, bic.isAcceptableOrUnknown(data['bic']!, _bicMeta));
-    } else if (isInserting) {
-      context.missing(_bicMeta);
     }
     if (data.containsKey('web')) {
       context.handle(
           _webMeta, web.isAcceptableOrUnknown(data['web']!, _webMeta));
-    } else if (isInserting) {
-      context.missing(_webMeta);
     }
     if (data.containsKey('phone')) {
       context.handle(
           _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
-    } else if (isInserting) {
-      context.missing(_phoneMeta);
     }
     if (data.containsKey('email')) {
       context.handle(
           _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
-    } else if (isInserting) {
-      context.missing(_emailMeta);
     }
     if (data.containsKey('logo')) {
       context.handle(
@@ -113,13 +105,13 @@ class $EntidadTable extends Entidad with TableInfo<$EntidadTable, EntidadData> {
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       bic: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}bic'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}bic']),
       web: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}web'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}web']),
       phone: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}phone'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}phone']),
       email: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}email']),
       logo: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}logo'])!,
     );
@@ -134,28 +126,36 @@ class $EntidadTable extends Entidad with TableInfo<$EntidadTable, EntidadData> {
 class EntidadData extends DataClass implements Insertable<EntidadData> {
   final int id;
   final String name;
-  final String bic;
-  final String web;
-  final String phone;
-  final String email;
+  final String? bic;
+  final String? web;
+  final String? phone;
+  final String? email;
   final String logo;
   const EntidadData(
       {required this.id,
       required this.name,
-      required this.bic,
-      required this.web,
-      required this.phone,
-      required this.email,
+      this.bic,
+      this.web,
+      this.phone,
+      this.email,
       required this.logo});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['bic'] = Variable<String>(bic);
-    map['web'] = Variable<String>(web);
-    map['phone'] = Variable<String>(phone);
-    map['email'] = Variable<String>(email);
+    if (!nullToAbsent || bic != null) {
+      map['bic'] = Variable<String>(bic);
+    }
+    if (!nullToAbsent || web != null) {
+      map['web'] = Variable<String>(web);
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
     map['logo'] = Variable<String>(logo);
     return map;
   }
@@ -164,10 +164,12 @@ class EntidadData extends DataClass implements Insertable<EntidadData> {
     return EntidadCompanion(
       id: Value(id),
       name: Value(name),
-      bic: Value(bic),
-      web: Value(web),
-      phone: Value(phone),
-      email: Value(email),
+      bic: bic == null && nullToAbsent ? const Value.absent() : Value(bic),
+      web: web == null && nullToAbsent ? const Value.absent() : Value(web),
+      phone:
+          phone == null && nullToAbsent ? const Value.absent() : Value(phone),
+      email:
+          email == null && nullToAbsent ? const Value.absent() : Value(email),
       logo: Value(logo),
     );
   }
@@ -178,10 +180,10 @@ class EntidadData extends DataClass implements Insertable<EntidadData> {
     return EntidadData(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      bic: serializer.fromJson<String>(json['bic']),
-      web: serializer.fromJson<String>(json['web']),
-      phone: serializer.fromJson<String>(json['phone']),
-      email: serializer.fromJson<String>(json['email']),
+      bic: serializer.fromJson<String?>(json['bic']),
+      web: serializer.fromJson<String?>(json['web']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      email: serializer.fromJson<String?>(json['email']),
       logo: serializer.fromJson<String>(json['logo']),
     );
   }
@@ -191,10 +193,10 @@ class EntidadData extends DataClass implements Insertable<EntidadData> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'bic': serializer.toJson<String>(bic),
-      'web': serializer.toJson<String>(web),
-      'phone': serializer.toJson<String>(phone),
-      'email': serializer.toJson<String>(email),
+      'bic': serializer.toJson<String?>(bic),
+      'web': serializer.toJson<String?>(web),
+      'phone': serializer.toJson<String?>(phone),
+      'email': serializer.toJson<String?>(email),
       'logo': serializer.toJson<String>(logo),
     };
   }
@@ -202,18 +204,18 @@ class EntidadData extends DataClass implements Insertable<EntidadData> {
   EntidadData copyWith(
           {int? id,
           String? name,
-          String? bic,
-          String? web,
-          String? phone,
-          String? email,
+          Value<String?> bic = const Value.absent(),
+          Value<String?> web = const Value.absent(),
+          Value<String?> phone = const Value.absent(),
+          Value<String?> email = const Value.absent(),
           String? logo}) =>
       EntidadData(
         id: id ?? this.id,
         name: name ?? this.name,
-        bic: bic ?? this.bic,
-        web: web ?? this.web,
-        phone: phone ?? this.phone,
-        email: email ?? this.email,
+        bic: bic.present ? bic.value : this.bic,
+        web: web.present ? web.value : this.web,
+        phone: phone.present ? phone.value : this.phone,
+        email: email.present ? email.value : this.email,
         logo: logo ?? this.logo,
       );
   EntidadData copyWithCompanion(EntidadCompanion data) {
@@ -260,10 +262,10 @@ class EntidadData extends DataClass implements Insertable<EntidadData> {
 class EntidadCompanion extends UpdateCompanion<EntidadData> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String> bic;
-  final Value<String> web;
-  final Value<String> phone;
-  final Value<String> email;
+  final Value<String?> bic;
+  final Value<String?> web;
+  final Value<String?> phone;
+  final Value<String?> email;
   final Value<String> logo;
   const EntidadCompanion({
     this.id = const Value.absent(),
@@ -277,16 +279,12 @@ class EntidadCompanion extends UpdateCompanion<EntidadData> {
   EntidadCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required String bic,
-    required String web,
-    required String phone,
-    required String email,
+    this.bic = const Value.absent(),
+    this.web = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
     required String logo,
   })  : name = Value(name),
-        bic = Value(bic),
-        web = Value(web),
-        phone = Value(phone),
-        email = Value(email),
         logo = Value(logo);
   static Insertable<EntidadData> custom({
     Expression<int>? id,
@@ -311,10 +309,10 @@ class EntidadCompanion extends UpdateCompanion<EntidadData> {
   EntidadCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
-      Value<String>? bic,
-      Value<String>? web,
-      Value<String>? phone,
-      Value<String>? email,
+      Value<String?>? bic,
+      Value<String?>? web,
+      Value<String?>? phone,
+      Value<String?>? email,
       Value<String>? logo}) {
     return EntidadCompanion(
       id: id ?? this.id,
@@ -2601,19 +2599,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$EntidadTableCreateCompanionBuilder = EntidadCompanion Function({
   Value<int> id,
   required String name,
-  required String bic,
-  required String web,
-  required String phone,
-  required String email,
+  Value<String?> bic,
+  Value<String?> web,
+  Value<String?> phone,
+  Value<String?> email,
   required String logo,
 });
 typedef $$EntidadTableUpdateCompanionBuilder = EntidadCompanion Function({
   Value<int> id,
   Value<String> name,
-  Value<String> bic,
-  Value<String> web,
-  Value<String> phone,
-  Value<String> email,
+  Value<String?> bic,
+  Value<String?> web,
+  Value<String?> phone,
+  Value<String?> email,
   Value<String> logo,
 });
 
@@ -2636,10 +2634,10 @@ class $$EntidadTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<String> bic = const Value.absent(),
-            Value<String> web = const Value.absent(),
-            Value<String> phone = const Value.absent(),
-            Value<String> email = const Value.absent(),
+            Value<String?> bic = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> phone = const Value.absent(),
+            Value<String?> email = const Value.absent(),
             Value<String> logo = const Value.absent(),
           }) =>
               EntidadCompanion(
@@ -2654,10 +2652,10 @@ class $$EntidadTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
-            required String bic,
-            required String web,
-            required String phone,
-            required String email,
+            Value<String?> bic = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> phone = const Value.absent(),
+            Value<String?> email = const Value.absent(),
             required String logo,
           }) =>
               EntidadCompanion.insert(
