@@ -114,7 +114,7 @@ class _FondoAddScreenState extends ConsumerState<FondoAddScreen> {
             dr.Value(double.tryParse(participaciones.text.trim()) ?? 0),
         tipo: const dr.Value(TipoOp.suscripcion),
       );
-      await database.addValorFondo(newValor);
+      await database.addValorFondo(newValor, id);
     } else {
       await database.updateFondo(widget.editFondo!.id, newFondo);
     }

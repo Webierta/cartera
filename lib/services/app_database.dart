@@ -229,8 +229,17 @@ class AppDatabase extends _$AppDatabase {
         .get();
   }
 
-  Future<int> addValorFondo(ValoresFondoCompanion newValor) {
-    return into(valoresFondo).insert(newValor);
+  Future<int> addValorFondo(ValoresFondoCompanion newValor, int fondoId) async {
+    var valoresByFecha = await getValoresByFecha(fondoId, newValor.fecha.value);
+    if (valoresByFecha.isEmpty) {
+      return into(valoresFondo).insert(newValor);
+    } else {
+      return (update(valoresFondo)
+            ..where((tbl) => tbl.id.equals(valoresByFecha.first.id)))
+          .write(newValor);
+    }
+
+    //return into(valoresFondo).insert(newValor);
   }
 
   Future<void> addValores(
@@ -243,7 +252,7 @@ class AppDatabase extends _$AppDatabase {
       var valoresByFecha = await getValoresByFecha(fondoId, valor.fecha.value);
       //insert<T, D>(table, row, onConflict: DoUpdate((_) => row));
       if (valoresByFecha.isEmpty) {
-        await addValorFondo(valor);
+        await addValorFondo(valor, fondoId);
       } else {
         await updateValor(valoresByFecha.first.id, valor);
       }

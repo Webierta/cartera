@@ -22,6 +22,7 @@ class FondoScreen extends ConsumerStatefulWidget {
 }
 
 class _FondoScreenState extends ConsumerState<FondoScreen> {
+  bool isLoading = false;
   late AppDatabase database;
   TextEditingController fechaController = TextEditingController();
   TextEditingController precioController = TextEditingController();
@@ -45,7 +46,6 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
 
   @override
   void initState() {
-    //stats = Stats(valoresFondo);
     database = ref.read(AppDatabase.provider);
     setValores();
     super.initState();
@@ -61,7 +61,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
 
   Future<void> setValores() async {
     final valores = await database.getValores(widget.fondo.id);
-    setState(() => valoresFondo = valores);
+    setState(() {
+      valoresFondo = valores;
+      isLoading = false;
+    });
     if (valoresFondo.isEmpty) {
       resetStats();
     } else {
@@ -87,6 +90,7 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
       tae = 0;
       mwr = 0;
       mwrAcum = 0;
+      isLoading = false;
     });
   }
 
@@ -141,24 +145,29 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
         valor: dr.Value(double.tryParse(precioController.text) ?? 0),
       );
     }
-    final valoresByFecha =
+    /*final valoresByFecha =
         await database.getValoresByFecha(widget.fondo.id, fecha);
     if (valoresByFecha.isNotEmpty) {
       await database.updateValor(valoresByFecha.first.id, newValor);
     } else {
       await database.addValorFondo(newValor);
-    }
+    }*/
+    await database.addValorFondo(newValor, widget.fondo.id);
     setValores();
   }
 
   Future<void> update() async {
+    setState(() {
+      isLoading = true;
+    });
     final valores = await YahooFinance().getYahooFinanceResponse(widget.fondo);
     if (valores == null || valores.isEmpty) {
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
-    //await database.addValores(valores);
-    await database.addValorFondo(valores.first);
-    //getIndices();
+    await database.addValorFondo(valores.first, widget.fondo.id);
     setValores();
   }
 
@@ -184,9 +193,11 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
     }
     DateTime start = FechaUtil.dateToDateHms(picked.start);
     DateTime end = FechaUtil.dateToDateHms(picked.end);
+    setState(() => isLoading = true);
     final valores =
         await YahooFinance().getYahooFinanceResponse(widget.fondo, end, start);
     if (valores == null || valores.isEmpty) {
+      setState(() => isLoading = false);
       return;
     }
     await database.addValores(valores, widget.fondo.id);
@@ -258,6 +269,9 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.fondo.name),
@@ -349,20 +363,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                           padding: const EdgeInsets.all(14.0),
                           child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  const CircleAvatar(
-                                    child: Icon(Icons.balance),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'BALANCE',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ],
+                              const TitleSection(
+                                title: 'BALANCE',
+                                icon: Icons.balance,
                               ),
-                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -422,20 +426,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                           padding: const EdgeInsets.all(14.0),
                           child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  const CircleAvatar(
-                                    child: Icon(Icons.percent),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'RENTABILIDAD',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ],
+                              const TitleSection(
+                                title: 'RENTABILIDAD',
+                                icon: Icons.percent,
                               ),
-                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -476,9 +470,11 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                   const Text('TWR TAE:'),
                                   Text(
                                     NumberUtil.percentCompact(tae),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
+                                      color:
+                                          tae > 0 ? Colors.green : Colors.red,
                                     ),
                                   ),
                                 ],
@@ -490,9 +486,11 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                                   const Text('MWR:'),
                                   Text(
                                     NumberUtil.percentCompact(mwr),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
+                                      color:
+                                          tae > 0 ? Colors.green : Colors.red,
                                     ),
                                   ),
                                 ],
@@ -510,19 +508,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                   padding: const EdgeInsets.all(14.0),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          const CircleAvatar(
-                            child: Icon(Icons.timeline),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'EVOLUCIÓN',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ],
+                      const TitleSection(
+                        title: 'EVOLUCIÓN',
+                        icon: Icons.timeline,
                       ),
-                      const SizedBox(height: 10),
                       IntrinsicHeight(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -651,7 +640,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                 return snapshot.hasData
                     ? Column(
                         children: [
-                          const Text('OPERACIONES'),
+                          const TitleSection(
+                            title: 'OPERACIONES',
+                            icon: Icons.shopping_cart,
+                          ),
                           HistoricoValores(
                             valores: snapshot.data!
                                 .where((data) => data.tipo != null)
@@ -665,7 +657,10 @@ class _FondoScreenState extends ConsumerState<FondoScreen> {
                             color: Colors.black,
                           ),*/
                           const SizedBox(height: 40),
-                          const Text('HISTÓRICO'),
+                          const TitleSection(
+                            title: 'HISTÓRICO',
+                            icon: Icons.calendar_month,
+                          ),
                           HistoricoValores(
                             valores: snapshot.data!,
                             delete: deleteValor,
@@ -992,7 +987,7 @@ class ListOperaciones extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Text(
-              NumberUtil.decimal(valor.participaciones ?? 0),
+              '${NumberUtil.decimal(valor.participaciones ?? 0)} part.',
               textAlign: TextAlign.right,
               style: const TextStyle(fontSize: 16),
             ),
@@ -1015,6 +1010,31 @@ class ListOperaciones extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class TitleSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  const TitleSection({super.key, required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            CircleAvatar(child: Icon(icon)),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }
