@@ -38,13 +38,11 @@ class _GraficoScreenState extends State<GraficoScreen> {
       color: color,
       barWidth: 2,
       isCurved: false,
+      dotData: const FlDotData(show: false),
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.5),
-            color.withOpacity(0),
-          ],
+          colors: [color.withOpacity(0.5), color.withOpacity(0)],
           stops: const [0.5, 1.0],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -121,23 +119,14 @@ class _GraficoScreenState extends State<GraficoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<double> totales = historicoFiltro.map((h) {
-      return h.totalCuentas + h.totalDepositos + h.totalFondos;
-    }).toList();
-    //final List<int> fechas = historicoFiltro.map((h) => FechaUtil.dateToEpoch(h.fecha)).toList();
-
+    final List<double> totales = historicoFiltro
+        .map((h) => h.totalCuentas + h.totalDepositos + h.totalFondos)
+        .toList();
     double totalMedio = 0;
     double totalMax = 0;
-    //double totalMin = 0;
-    //String? fechaMax;
-    //String? fechaMin;
-
     if (totales.length > 1) {
       totalMedio = totales.reduce((a, b) => a + b) / totales.length;
       totalMax = totales.reduce((curr, next) => curr > next ? curr : next);
-      //totalMin = totales.reduce((curr, next) => curr < next ? curr : next);
-      //fechaMax = FechaUtil.epochToString(fechas[totales.indexOf(totalMax)]);
-      //fechaMin = FechaUtil.epochToString(fechas[totales.indexOf(totalMin)]);
     }
 
     Map<int, double> mapDataCuentas = {};
@@ -199,11 +188,15 @@ class _GraficoScreenState extends State<GraficoScreen> {
                 color: touchedSpot.bar.gradient?.colors[0] ??
                     touchedSpot.bar.color,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: 12,
               );
               if (touchedSpot.barIndex == 0) {
                 return LineTooltipItem(
-                    fecha, const TextStyle(color: Colors.white, fontSize: 16),
+                    fecha,
+                    const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                     textAlign: TextAlign.center,
                     children: [
                       TextSpan(

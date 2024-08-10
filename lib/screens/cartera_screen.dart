@@ -13,7 +13,6 @@ import '../utils/local_storage.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/confirm_dialog.dart';
-import '../widgets/dia_calendario.dart';
 import '../widgets/menu.dart';
 import 'cuentas_screen.dart';
 import 'depositos_screen.dart';
@@ -709,31 +708,16 @@ class HistoricoCartera extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 3,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: SizedBox(
-                      height: 50,
-                      child: DiaCalendario(
-                          epoch: FechaUtil.dateToEpoch(historico.fecha)),
-                    ),
+                  child: SizedBox(
+                    height: 50,
+                    /*child: DiaCalendario(
+                      epoch: FechaUtil.dateToEpoch(historico.fecha),
+                    ),*/
+                    child: Text(FechaUtil.dateToString(
+                      date: historico.fecha,
+                      formato: 'MMM yy',
+                    )),
                   ),
-                  /*child: IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          FechaUtil.dateToString(
-                              date: historico.fecha, formato: 'dd/MM'),
-                          //textAlign: TextAlign.right,
-                        ),
-                        Text(
-                          FechaUtil.dateToString(
-                              date: historico.fecha, formato: 'yyyy'),
-                          //textAlign: TextAlign.right,
-                        ),
-                      ],
-                    ),
-                  ),*/
                 ),
                 Expanded(
                   flex: 5,

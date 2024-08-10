@@ -12,6 +12,24 @@ class Stats {
   final List<ValoresFondoData> valores;
   const Stats(this.valores);
 
+  double difValores(ValoresFondoData valor, FondoData fondo,
+      [bool total = false]) {
+    bool isFirstValor = valores.length > (valores.indexOf(valor) + 1);
+    if (isFirstValor && total != true) {
+      return valor.valor - valores[valores.indexOf(valor) + 1].valor;
+    }
+    return valor.valor - fondo.valorInicial;
+  }
+
+  double difPer(ValoresFondoData valor, FondoData fondo) {
+    double dif = difValores(valor, fondo);
+    bool isFirstValor = valores.length > (valores.indexOf(valor) + 1);
+    if (isFirstValor) {
+      return dif / valores[valores.indexOf(valor) + 1].valor;
+    }
+    return dif / fondo.valorInicial;
+  }
+
   double? precioMinimo() {
     if (valores.isNotEmpty) {
       final List<double> precios = valores.map((v) => v.valor).toList();
