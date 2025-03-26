@@ -396,8 +396,6 @@ class $CuentaTable extends Cuenta with TableInfo<$CuentaTable, CuentaData> {
   late final GeneratedColumn<double> tae = GeneratedColumn<double>(
       'tae', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _titularMeta =
-      const VerificationMeta('titular');
   @override
   late final GeneratedColumnWithTypeConverter<Titular, String> titular =
       GeneratedColumn<String>('titular', aliasedName, false,
@@ -445,7 +443,6 @@ class $CuentaTable extends Cuenta with TableInfo<$CuentaTable, CuentaData> {
     } else if (isInserting) {
       context.missing(_taeMeta);
     }
-    context.handle(_titularMeta, const VerificationResult.success());
     if (data.containsKey('entidad')) {
       context.handle(_entidadMeta,
           entidad.isAcceptableOrUnknown(data['entidad']!, _entidadMeta));
@@ -1025,8 +1022,6 @@ class $DepositoTable extends Deposito
   late final GeneratedColumn<double> tae = GeneratedColumn<double>(
       'tae', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _titularMeta =
-      const VerificationMeta('titular');
   @override
   late final GeneratedColumnWithTypeConverter<Titular, String> titular =
       GeneratedColumn<String>('titular', aliasedName, false,
@@ -1113,7 +1108,6 @@ class $DepositoTable extends Deposito
     } else if (isInserting) {
       context.missing(_taeMeta);
     }
-    context.handle(_titularMeta, const VerificationResult.success());
     if (data.containsKey('entidad')) {
       context.handle(_entidadMeta,
           entidad.isAcceptableOrUnknown(data['entidad']!, _entidadMeta));
@@ -1523,8 +1517,6 @@ class $FondoTable extends Fondo with TableInfo<$FondoTable, FondoData> {
   late final GeneratedColumn<DateTime> fechaInicial = GeneratedColumn<DateTime>(
       'fecha_inicial', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _titularMeta =
-      const VerificationMeta('titular');
   @override
   late final GeneratedColumnWithTypeConverter<Titular, String> titular =
       GeneratedColumn<String>('titular', aliasedName, false,
@@ -1597,7 +1589,6 @@ class $FondoTable extends Fondo with TableInfo<$FondoTable, FondoData> {
     } else if (isInserting) {
       context.missing(_fechaInicialMeta);
     }
-    context.handle(_titularMeta, const VerificationResult.success());
     if (data.containsKey('entidad')) {
       context.handle(_entidadMeta,
           entidad.isAcceptableOrUnknown(data['entidad']!, _entidadMeta));
@@ -1950,7 +1941,6 @@ class $ValoresFondoTable extends ValoresFondo
   late final GeneratedColumn<double> valor = GeneratedColumn<double>(
       'valor', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _tipoMeta = const VerificationMeta('tipo');
   @override
   late final GeneratedColumnWithTypeConverter<TipoOp?, String> tipo =
       GeneratedColumn<String>('tipo', aliasedName, true,
@@ -1994,7 +1984,6 @@ class $ValoresFondoTable extends ValoresFondo
     } else if (isInserting) {
       context.missing(_valorMeta);
     }
-    context.handle(_tipoMeta, const VerificationResult.success());
     if (data.containsKey('participaciones')) {
       context.handle(
           _participacionesMeta,
@@ -2615,22 +2604,296 @@ typedef $$EntidadTableUpdateCompanionBuilder = EntidadCompanion Function({
   Value<String> logo,
 });
 
+final class $$EntidadTableReferences
+    extends BaseReferences<_$AppDatabase, $EntidadTable, EntidadData> {
+  $$EntidadTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CuentaTable, List<CuentaData>> _cuentaRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.cuenta,
+          aliasName: $_aliasNameGenerator(db.entidad.name, db.cuenta.entidad));
+
+  $$CuentaTableProcessedTableManager get cuentaRefs {
+    final manager = $$CuentaTableTableManager($_db, $_db.cuenta)
+        .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
+
+    final cache = $_typedResult.readTableOrNull(_cuentaRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$DepositoTable, List<DepositoData>>
+      _depositoRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.deposito,
+              aliasName:
+                  $_aliasNameGenerator(db.entidad.name, db.deposito.entidad));
+
+  $$DepositoTableProcessedTableManager get depositoRefs {
+    final manager = $$DepositoTableTableManager($_db, $_db.deposito)
+        .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
+
+    final cache = $_typedResult.readTableOrNull(_depositoRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$FondoTable, List<FondoData>> _fondoRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.fondo,
+          aliasName: $_aliasNameGenerator(db.entidad.name, db.fondo.entidad));
+
+  $$FondoTableProcessedTableManager get fondoRefs {
+    final manager = $$FondoTableTableManager($_db, $_db.fondo)
+        .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
+
+    final cache = $_typedResult.readTableOrNull(_fondoRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$EntidadTableFilterComposer
+    extends Composer<_$AppDatabase, $EntidadTable> {
+  $$EntidadTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get bic => $composableBuilder(
+      column: $table.bic, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get phone => $composableBuilder(
+      column: $table.phone, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get logo => $composableBuilder(
+      column: $table.logo, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> cuentaRefs(
+      Expression<bool> Function($$CuentaTableFilterComposer f) f) {
+    final $$CuentaTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.cuenta,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CuentaTableFilterComposer(
+              $db: $db,
+              $table: $db.cuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> depositoRefs(
+      Expression<bool> Function($$DepositoTableFilterComposer f) f) {
+    final $$DepositoTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.deposito,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DepositoTableFilterComposer(
+              $db: $db,
+              $table: $db.deposito,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> fondoRefs(
+      Expression<bool> Function($$FondoTableFilterComposer f) f) {
+    final $$FondoTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.fondo,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FondoTableFilterComposer(
+              $db: $db,
+              $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$EntidadTableOrderingComposer
+    extends Composer<_$AppDatabase, $EntidadTable> {
+  $$EntidadTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get bic => $composableBuilder(
+      column: $table.bic, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+      column: $table.phone, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get logo => $composableBuilder(
+      column: $table.logo, builder: (column) => ColumnOrderings(column));
+}
+
+class $$EntidadTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EntidadTable> {
+  $$EntidadTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get bic =>
+      $composableBuilder(column: $table.bic, builder: (column) => column);
+
+  GeneratedColumn<String> get web =>
+      $composableBuilder(column: $table.web, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get logo =>
+      $composableBuilder(column: $table.logo, builder: (column) => column);
+
+  Expression<T> cuentaRefs<T extends Object>(
+      Expression<T> Function($$CuentaTableAnnotationComposer a) f) {
+    final $$CuentaTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.cuenta,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CuentaTableAnnotationComposer(
+              $db: $db,
+              $table: $db.cuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> depositoRefs<T extends Object>(
+      Expression<T> Function($$DepositoTableAnnotationComposer a) f) {
+    final $$DepositoTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.deposito,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DepositoTableAnnotationComposer(
+              $db: $db,
+              $table: $db.deposito,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> fondoRefs<T extends Object>(
+      Expression<T> Function($$FondoTableAnnotationComposer a) f) {
+    final $$FondoTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.fondo,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FondoTableAnnotationComposer(
+              $db: $db,
+              $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
 class $$EntidadTableTableManager extends RootTableManager<
     _$AppDatabase,
     $EntidadTable,
     EntidadData,
     $$EntidadTableFilterComposer,
     $$EntidadTableOrderingComposer,
+    $$EntidadTableAnnotationComposer,
     $$EntidadTableCreateCompanionBuilder,
-    $$EntidadTableUpdateCompanionBuilder> {
+    $$EntidadTableUpdateCompanionBuilder,
+    (EntidadData, $$EntidadTableReferences),
+    EntidadData,
+    PrefetchHooks Function(
+        {bool cuentaRefs, bool depositoRefs, bool fondoRefs})> {
   $$EntidadTableTableManager(_$AppDatabase db, $EntidadTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$EntidadTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$EntidadTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$EntidadTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EntidadTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EntidadTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -2667,126 +2930,79 @@ class $$EntidadTableTableManager extends RootTableManager<
             email: email,
             logo: logo,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$EntidadTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: (
+              {cuentaRefs = false, depositoRefs = false, fondoRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (cuentaRefs) db.cuenta,
+                if (depositoRefs) db.deposito,
+                if (fondoRefs) db.fondo
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (cuentaRefs)
+                    await $_getPrefetchedData<EntidadData, $EntidadTable,
+                            CuentaData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$EntidadTableReferences._cuentaRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$EntidadTableReferences(db, table, p0).cuentaRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.entidad == item.name),
+                        typedResults: items),
+                  if (depositoRefs)
+                    await $_getPrefetchedData<EntidadData, $EntidadTable,
+                            DepositoData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$EntidadTableReferences._depositoRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$EntidadTableReferences(db, table, p0)
+                                .depositoRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.entidad == item.name),
+                        typedResults: items),
+                  if (fondoRefs)
+                    await $_getPrefetchedData<EntidadData, $EntidadTable,
+                            FondoData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$EntidadTableReferences._fondoRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$EntidadTableReferences(db, table, p0).fondoRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.entidad == item.name),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
-class $$EntidadTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $EntidadTable> {
-  $$EntidadTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get bic => $state.composableBuilder(
-      column: $state.table.bic,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get web => $state.composableBuilder(
-      column: $state.table.web,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get phone => $state.composableBuilder(
-      column: $state.table.phone,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get email => $state.composableBuilder(
-      column: $state.table.email,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get logo => $state.composableBuilder(
-      column: $state.table.logo,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ComposableFilter cuentaRefs(
-      ComposableFilter Function($$CuentaTableFilterComposer f) f) {
-    final $$CuentaTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.name,
-        referencedTable: $state.db.cuenta,
-        getReferencedColumn: (t) => t.entidad,
-        builder: (joinBuilder, parentComposers) => $$CuentaTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.cuenta, joinBuilder, parentComposers)));
-    return f(composer);
-  }
-
-  ComposableFilter depositoRefs(
-      ComposableFilter Function($$DepositoTableFilterComposer f) f) {
-    final $$DepositoTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.name,
-        referencedTable: $state.db.deposito,
-        getReferencedColumn: (t) => t.entidad,
-        builder: (joinBuilder, parentComposers) =>
-            $$DepositoTableFilterComposer(ComposerState(
-                $state.db, $state.db.deposito, joinBuilder, parentComposers)));
-    return f(composer);
-  }
-
-  ComposableFilter fondoRefs(
-      ComposableFilter Function($$FondoTableFilterComposer f) f) {
-    final $$FondoTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.name,
-        referencedTable: $state.db.fondo,
-        getReferencedColumn: (t) => t.entidad,
-        builder: (joinBuilder, parentComposers) => $$FondoTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.fondo, joinBuilder, parentComposers)));
-    return f(composer);
-  }
-}
-
-class $$EntidadTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $EntidadTable> {
-  $$EntidadTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get bic => $state.composableBuilder(
-      column: $state.table.bic,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get web => $state.composableBuilder(
-      column: $state.table.web,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get phone => $state.composableBuilder(
-      column: $state.table.phone,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get email => $state.composableBuilder(
-      column: $state.table.email,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get logo => $state.composableBuilder(
-      column: $state.table.logo,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-}
-
+typedef $$EntidadTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $EntidadTable,
+    EntidadData,
+    $$EntidadTableFilterComposer,
+    $$EntidadTableOrderingComposer,
+    $$EntidadTableAnnotationComposer,
+    $$EntidadTableCreateCompanionBuilder,
+    $$EntidadTableUpdateCompanionBuilder,
+    (EntidadData, $$EntidadTableReferences),
+    EntidadData,
+    PrefetchHooks Function(
+        {bool cuentaRefs, bool depositoRefs, bool fondoRefs})>;
 typedef $$CuentaTableCreateCompanionBuilder = CuentaCompanion Function({
   Value<int> id,
   required String name,
@@ -2804,22 +3020,241 @@ typedef $$CuentaTableUpdateCompanionBuilder = CuentaCompanion Function({
   Value<String> entidad,
 });
 
+final class $$CuentaTableReferences
+    extends BaseReferences<_$AppDatabase, $CuentaTable, CuentaData> {
+  $$CuentaTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EntidadTable _entidadTable(_$AppDatabase db) => db.entidad
+      .createAlias($_aliasNameGenerator(db.cuenta.entidad, db.entidad.name));
+
+  $$EntidadTableProcessedTableManager get entidad {
+    final $_column = $_itemColumn<String>('entidad')!;
+
+    final manager = $$EntidadTableTableManager($_db, $_db.entidad)
+        .filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entidadTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static MultiTypedResultKey<$SaldosCuentaTable, List<SaldosCuentaData>>
+      _saldosCuentaRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.saldosCuenta,
+              aliasName:
+                  $_aliasNameGenerator(db.cuenta.id, db.saldosCuenta.cuenta));
+
+  $$SaldosCuentaTableProcessedTableManager get saldosCuentaRefs {
+    final manager = $$SaldosCuentaTableTableManager($_db, $_db.saldosCuenta)
+        .filter((f) => f.cuenta.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_saldosCuentaRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$CuentaTableFilterComposer
+    extends Composer<_$AppDatabase, $CuentaTable> {
+  $$CuentaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get iban => $composableBuilder(
+      column: $table.iban, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get tae => $composableBuilder(
+      column: $table.tae, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
+      $composableBuilder(
+          column: $table.titular,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  $$EntidadTableFilterComposer get entidad {
+    final $$EntidadTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableFilterComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<bool> saldosCuentaRefs(
+      Expression<bool> Function($$SaldosCuentaTableFilterComposer f) f) {
+    final $$SaldosCuentaTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.saldosCuenta,
+        getReferencedColumn: (t) => t.cuenta,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SaldosCuentaTableFilterComposer(
+              $db: $db,
+              $table: $db.saldosCuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$CuentaTableOrderingComposer
+    extends Composer<_$AppDatabase, $CuentaTable> {
+  $$CuentaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get iban => $composableBuilder(
+      column: $table.iban, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get tae => $composableBuilder(
+      column: $table.tae, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get titular => $composableBuilder(
+      column: $table.titular, builder: (column) => ColumnOrderings(column));
+
+  $$EntidadTableOrderingComposer get entidad {
+    final $$EntidadTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableOrderingComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$CuentaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CuentaTable> {
+  $$CuentaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get iban =>
+      $composableBuilder(column: $table.iban, builder: (column) => column);
+
+  GeneratedColumn<double> get tae =>
+      $composableBuilder(column: $table.tae, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Titular, String> get titular =>
+      $composableBuilder(column: $table.titular, builder: (column) => column);
+
+  $$EntidadTableAnnotationComposer get entidad {
+    final $$EntidadTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableAnnotationComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<T> saldosCuentaRefs<T extends Object>(
+      Expression<T> Function($$SaldosCuentaTableAnnotationComposer a) f) {
+    final $$SaldosCuentaTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.saldosCuenta,
+        getReferencedColumn: (t) => t.cuenta,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SaldosCuentaTableAnnotationComposer(
+              $db: $db,
+              $table: $db.saldosCuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
 class $$CuentaTableTableManager extends RootTableManager<
     _$AppDatabase,
     $CuentaTable,
     CuentaData,
     $$CuentaTableFilterComposer,
     $$CuentaTableOrderingComposer,
+    $$CuentaTableAnnotationComposer,
     $$CuentaTableCreateCompanionBuilder,
-    $$CuentaTableUpdateCompanionBuilder> {
+    $$CuentaTableUpdateCompanionBuilder,
+    (CuentaData, $$CuentaTableReferences),
+    CuentaData,
+    PrefetchHooks Function({bool entidad, bool saldosCuentaRefs})> {
   $$CuentaTableTableManager(_$AppDatabase db, $CuentaTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$CuentaTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$CuentaTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$CuentaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CuentaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CuentaTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -2852,106 +3287,73 @@ class $$CuentaTableTableManager extends RootTableManager<
             titular: titular,
             entidad: entidad,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$CuentaTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({entidad = false, saldosCuentaRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (saldosCuentaRefs) db.saldosCuenta],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (entidad) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.entidad,
+                    referencedTable: $$CuentaTableReferences._entidadTable(db),
+                    referencedColumn:
+                        $$CuentaTableReferences._entidadTable(db).name,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (saldosCuentaRefs)
+                    await $_getPrefetchedData<CuentaData, $CuentaTable,
+                            SaldosCuentaData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$CuentaTableReferences._saldosCuentaRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$CuentaTableReferences(db, table, p0)
+                                .saldosCuentaRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.cuenta == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
-class $$CuentaTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $CuentaTable> {
-  $$CuentaTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get iban => $state.composableBuilder(
-      column: $state.table.iban,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get tae => $state.composableBuilder(
-      column: $state.table.tae,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
-      $state.composableBuilder(
-          column: $state.table.titular,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
-
-  $$EntidadTableFilterComposer get entidad {
-    final $$EntidadTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) => $$EntidadTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-
-  ComposableFilter saldosCuentaRefs(
-      ComposableFilter Function($$SaldosCuentaTableFilterComposer f) f) {
-    final $$SaldosCuentaTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $state.db.saldosCuenta,
-        getReferencedColumn: (t) => t.cuenta,
-        builder: (joinBuilder, parentComposers) =>
-            $$SaldosCuentaTableFilterComposer(ComposerState($state.db,
-                $state.db.saldosCuenta, joinBuilder, parentComposers)));
-    return f(composer);
-  }
-}
-
-class $$CuentaTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $CuentaTable> {
-  $$CuentaTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get iban => $state.composableBuilder(
-      column: $state.table.iban,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get tae => $state.composableBuilder(
-      column: $state.table.tae,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get titular => $state.composableBuilder(
-      column: $state.table.titular,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$EntidadTableOrderingComposer get entidad {
-    final $$EntidadTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) =>
-            $$EntidadTableOrderingComposer(ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
+typedef $$CuentaTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CuentaTable,
+    CuentaData,
+    $$CuentaTableFilterComposer,
+    $$CuentaTableOrderingComposer,
+    $$CuentaTableAnnotationComposer,
+    $$CuentaTableCreateCompanionBuilder,
+    $$CuentaTableUpdateCompanionBuilder,
+    (CuentaData, $$CuentaTableReferences),
+    CuentaData,
+    PrefetchHooks Function({bool entidad, bool saldosCuentaRefs})>;
 typedef $$SaldosCuentaTableCreateCompanionBuilder = SaldosCuentaCompanion
     Function({
   Value<int> id,
@@ -2967,22 +3369,164 @@ typedef $$SaldosCuentaTableUpdateCompanionBuilder = SaldosCuentaCompanion
   Value<double> saldo,
 });
 
+final class $$SaldosCuentaTableReferences extends BaseReferences<_$AppDatabase,
+    $SaldosCuentaTable, SaldosCuentaData> {
+  $$SaldosCuentaTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $CuentaTable _cuentaTable(_$AppDatabase db) => db.cuenta
+      .createAlias($_aliasNameGenerator(db.saldosCuenta.cuenta, db.cuenta.id));
+
+  $$CuentaTableProcessedTableManager? get cuenta {
+    final $_column = $_itemColumn<int>('cuenta');
+    if ($_column == null) return null;
+    final manager = $$CuentaTableTableManager($_db, $_db.cuenta)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cuentaTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$SaldosCuentaTableFilterComposer
+    extends Composer<_$AppDatabase, $SaldosCuentaTable> {
+  $$SaldosCuentaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get saldo => $composableBuilder(
+      column: $table.saldo, builder: (column) => ColumnFilters(column));
+
+  $$CuentaTableFilterComposer get cuenta {
+    final $$CuentaTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.cuenta,
+        referencedTable: $db.cuenta,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CuentaTableFilterComposer(
+              $db: $db,
+              $table: $db.cuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SaldosCuentaTableOrderingComposer
+    extends Composer<_$AppDatabase, $SaldosCuentaTable> {
+  $$SaldosCuentaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get saldo => $composableBuilder(
+      column: $table.saldo, builder: (column) => ColumnOrderings(column));
+
+  $$CuentaTableOrderingComposer get cuenta {
+    final $$CuentaTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.cuenta,
+        referencedTable: $db.cuenta,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CuentaTableOrderingComposer(
+              $db: $db,
+              $table: $db.cuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SaldosCuentaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SaldosCuentaTable> {
+  $$SaldosCuentaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fecha =>
+      $composableBuilder(column: $table.fecha, builder: (column) => column);
+
+  GeneratedColumn<double> get saldo =>
+      $composableBuilder(column: $table.saldo, builder: (column) => column);
+
+  $$CuentaTableAnnotationComposer get cuenta {
+    final $$CuentaTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.cuenta,
+        referencedTable: $db.cuenta,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CuentaTableAnnotationComposer(
+              $db: $db,
+              $table: $db.cuenta,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
 class $$SaldosCuentaTableTableManager extends RootTableManager<
     _$AppDatabase,
     $SaldosCuentaTable,
     SaldosCuentaData,
     $$SaldosCuentaTableFilterComposer,
     $$SaldosCuentaTableOrderingComposer,
+    $$SaldosCuentaTableAnnotationComposer,
     $$SaldosCuentaTableCreateCompanionBuilder,
-    $$SaldosCuentaTableUpdateCompanionBuilder> {
+    $$SaldosCuentaTableUpdateCompanionBuilder,
+    (SaldosCuentaData, $$SaldosCuentaTableReferences),
+    SaldosCuentaData,
+    PrefetchHooks Function({bool cuenta})> {
   $$SaldosCuentaTableTableManager(_$AppDatabase db, $SaldosCuentaTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$SaldosCuentaTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$SaldosCuentaTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$SaldosCuentaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SaldosCuentaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SaldosCuentaTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int?> cuenta = const Value.absent(),
@@ -3007,71 +3551,62 @@ class $$SaldosCuentaTableTableManager extends RootTableManager<
             fecha: fecha,
             saldo: saldo,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$SaldosCuentaTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({cuenta = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (cuenta) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.cuenta,
+                    referencedTable:
+                        $$SaldosCuentaTableReferences._cuentaTable(db),
+                    referencedColumn:
+                        $$SaldosCuentaTableReferences._cuentaTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ));
 }
 
-class $$SaldosCuentaTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $SaldosCuentaTable> {
-  $$SaldosCuentaTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get saldo => $state.composableBuilder(
-      column: $state.table.saldo,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  $$CuentaTableFilterComposer get cuenta {
-    final $$CuentaTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.cuenta,
-        referencedTable: $state.db.cuenta,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) => $$CuentaTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.cuenta, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
-class $$SaldosCuentaTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $SaldosCuentaTable> {
-  $$SaldosCuentaTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get saldo => $state.composableBuilder(
-      column: $state.table.saldo,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$CuentaTableOrderingComposer get cuenta {
-    final $$CuentaTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.cuenta,
-        referencedTable: $state.db.cuenta,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) =>
-            $$CuentaTableOrderingComposer(ComposerState(
-                $state.db, $state.db.cuenta, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
+typedef $$SaldosCuentaTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SaldosCuentaTable,
+    SaldosCuentaData,
+    $$SaldosCuentaTableFilterComposer,
+    $$SaldosCuentaTableOrderingComposer,
+    $$SaldosCuentaTableAnnotationComposer,
+    $$SaldosCuentaTableCreateCompanionBuilder,
+    $$SaldosCuentaTableUpdateCompanionBuilder,
+    (SaldosCuentaData, $$SaldosCuentaTableReferences),
+    SaldosCuentaData,
+    PrefetchHooks Function({bool cuenta})>;
 typedef $$DepositoTableCreateCompanionBuilder = DepositoCompanion Function({
   Value<int> id,
   required String name,
@@ -3097,22 +3632,220 @@ typedef $$DepositoTableUpdateCompanionBuilder = DepositoCompanion Function({
   Value<String> entidad,
 });
 
+final class $$DepositoTableReferences
+    extends BaseReferences<_$AppDatabase, $DepositoTable, DepositoData> {
+  $$DepositoTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EntidadTable _entidadTable(_$AppDatabase db) => db.entidad
+      .createAlias($_aliasNameGenerator(db.deposito.entidad, db.entidad.name));
+
+  $$EntidadTableProcessedTableManager get entidad {
+    final $_column = $_itemColumn<String>('entidad')!;
+
+    final manager = $$EntidadTableTableManager($_db, $_db.entidad)
+        .filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entidadTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$DepositoTableFilterComposer
+    extends Composer<_$AppDatabase, $DepositoTable> {
+  $$DepositoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get codigo => $composableBuilder(
+      column: $table.codigo, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get imposicion => $composableBuilder(
+      column: $table.imposicion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get renovacion => $composableBuilder(
+      column: $table.renovacion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get inicio => $composableBuilder(
+      column: $table.inicio, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get vencimiento => $composableBuilder(
+      column: $table.vencimiento, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get tae => $composableBuilder(
+      column: $table.tae, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
+      $composableBuilder(
+          column: $table.titular,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  $$EntidadTableFilterComposer get entidad {
+    final $$EntidadTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableFilterComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$DepositoTableOrderingComposer
+    extends Composer<_$AppDatabase, $DepositoTable> {
+  $$DepositoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get codigo => $composableBuilder(
+      column: $table.codigo, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get imposicion => $composableBuilder(
+      column: $table.imposicion, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get renovacion => $composableBuilder(
+      column: $table.renovacion, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get inicio => $composableBuilder(
+      column: $table.inicio, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get vencimiento => $composableBuilder(
+      column: $table.vencimiento, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get tae => $composableBuilder(
+      column: $table.tae, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get titular => $composableBuilder(
+      column: $table.titular, builder: (column) => ColumnOrderings(column));
+
+  $$EntidadTableOrderingComposer get entidad {
+    final $$EntidadTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableOrderingComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$DepositoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DepositoTable> {
+  $$DepositoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get codigo =>
+      $composableBuilder(column: $table.codigo, builder: (column) => column);
+
+  GeneratedColumn<double> get imposicion => $composableBuilder(
+      column: $table.imposicion, builder: (column) => column);
+
+  GeneratedColumn<bool> get renovacion => $composableBuilder(
+      column: $table.renovacion, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get inicio =>
+      $composableBuilder(column: $table.inicio, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get vencimiento => $composableBuilder(
+      column: $table.vencimiento, builder: (column) => column);
+
+  GeneratedColumn<double> get tae =>
+      $composableBuilder(column: $table.tae, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Titular, String> get titular =>
+      $composableBuilder(column: $table.titular, builder: (column) => column);
+
+  $$EntidadTableAnnotationComposer get entidad {
+    final $$EntidadTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableAnnotationComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
 class $$DepositoTableTableManager extends RootTableManager<
     _$AppDatabase,
     $DepositoTable,
     DepositoData,
     $$DepositoTableFilterComposer,
     $$DepositoTableOrderingComposer,
+    $$DepositoTableAnnotationComposer,
     $$DepositoTableCreateCompanionBuilder,
-    $$DepositoTableUpdateCompanionBuilder> {
+    $$DepositoTableUpdateCompanionBuilder,
+    (DepositoData, $$DepositoTableReferences),
+    DepositoData,
+    PrefetchHooks Function({bool entidad})> {
   $$DepositoTableTableManager(_$AppDatabase db, $DepositoTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$DepositoTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$DepositoTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$DepositoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DepositoTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DepositoTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -3161,133 +3894,60 @@ class $$DepositoTableTableManager extends RootTableManager<
             titular: titular,
             entidad: entidad,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$DepositoTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({entidad = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (entidad) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.entidad,
+                    referencedTable:
+                        $$DepositoTableReferences._entidadTable(db),
+                    referencedColumn:
+                        $$DepositoTableReferences._entidadTable(db).name,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ));
 }
 
-class $$DepositoTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $DepositoTable> {
-  $$DepositoTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get codigo => $state.composableBuilder(
-      column: $state.table.codigo,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get imposicion => $state.composableBuilder(
-      column: $state.table.imposicion,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<bool> get renovacion => $state.composableBuilder(
-      column: $state.table.renovacion,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get inicio => $state.composableBuilder(
-      column: $state.table.inicio,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get vencimiento => $state.composableBuilder(
-      column: $state.table.vencimiento,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get tae => $state.composableBuilder(
-      column: $state.table.tae,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
-      $state.composableBuilder(
-          column: $state.table.titular,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
-
-  $$EntidadTableFilterComposer get entidad {
-    final $$EntidadTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) => $$EntidadTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
-class $$DepositoTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $DepositoTable> {
-  $$DepositoTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get codigo => $state.composableBuilder(
-      column: $state.table.codigo,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get imposicion => $state.composableBuilder(
-      column: $state.table.imposicion,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<bool> get renovacion => $state.composableBuilder(
-      column: $state.table.renovacion,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get inicio => $state.composableBuilder(
-      column: $state.table.inicio,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get vencimiento => $state.composableBuilder(
-      column: $state.table.vencimiento,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get tae => $state.composableBuilder(
-      column: $state.table.tae,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get titular => $state.composableBuilder(
-      column: $state.table.titular,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$EntidadTableOrderingComposer get entidad {
-    final $$EntidadTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) =>
-            $$EntidadTableOrderingComposer(ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
+typedef $$DepositoTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $DepositoTable,
+    DepositoData,
+    $$DepositoTableFilterComposer,
+    $$DepositoTableOrderingComposer,
+    $$DepositoTableAnnotationComposer,
+    $$DepositoTableCreateCompanionBuilder,
+    $$DepositoTableUpdateCompanionBuilder,
+    (DepositoData, $$DepositoTableReferences),
+    DepositoData,
+    PrefetchHooks Function({bool entidad})>;
 typedef $$FondoTableCreateCompanionBuilder = FondoCompanion Function({
   Value<int> id,
   required String name,
@@ -3309,22 +3969,261 @@ typedef $$FondoTableUpdateCompanionBuilder = FondoCompanion Function({
   Value<String> entidad,
 });
 
+final class $$FondoTableReferences
+    extends BaseReferences<_$AppDatabase, $FondoTable, FondoData> {
+  $$FondoTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EntidadTable _entidadTable(_$AppDatabase db) => db.entidad
+      .createAlias($_aliasNameGenerator(db.fondo.entidad, db.entidad.name));
+
+  $$EntidadTableProcessedTableManager get entidad {
+    final $_column = $_itemColumn<String>('entidad')!;
+
+    final manager = $$EntidadTableTableManager($_db, $_db.entidad)
+        .filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entidadTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static MultiTypedResultKey<$ValoresFondoTable, List<ValoresFondoData>>
+      _valoresFondoRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+          db.valoresFondo,
+          aliasName: $_aliasNameGenerator(db.fondo.id, db.valoresFondo.fondo));
+
+  $$ValoresFondoTableProcessedTableManager get valoresFondoRefs {
+    final manager = $$ValoresFondoTableTableManager($_db, $_db.valoresFondo)
+        .filter((f) => f.fondo.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_valoresFondoRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$FondoTableFilterComposer extends Composer<_$AppDatabase, $FondoTable> {
+  $$FondoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get isin => $composableBuilder(
+      column: $table.isin, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get participaciones => $composableBuilder(
+      column: $table.participaciones,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get valorInicial => $composableBuilder(
+      column: $table.valorInicial, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get fechaInicial => $composableBuilder(
+      column: $table.fechaInicial, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
+      $composableBuilder(
+          column: $table.titular,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  $$EntidadTableFilterComposer get entidad {
+    final $$EntidadTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableFilterComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<bool> valoresFondoRefs(
+      Expression<bool> Function($$ValoresFondoTableFilterComposer f) f) {
+    final $$ValoresFondoTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.valoresFondo,
+        getReferencedColumn: (t) => t.fondo,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ValoresFondoTableFilterComposer(
+              $db: $db,
+              $table: $db.valoresFondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$FondoTableOrderingComposer
+    extends Composer<_$AppDatabase, $FondoTable> {
+  $$FondoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get isin => $composableBuilder(
+      column: $table.isin, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get participaciones => $composableBuilder(
+      column: $table.participaciones,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get valorInicial => $composableBuilder(
+      column: $table.valorInicial,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get fechaInicial => $composableBuilder(
+      column: $table.fechaInicial,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get titular => $composableBuilder(
+      column: $table.titular, builder: (column) => ColumnOrderings(column));
+
+  $$EntidadTableOrderingComposer get entidad {
+    final $$EntidadTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableOrderingComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$FondoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FondoTable> {
+  $$FondoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get isin =>
+      $composableBuilder(column: $table.isin, builder: (column) => column);
+
+  GeneratedColumn<double> get participaciones => $composableBuilder(
+      column: $table.participaciones, builder: (column) => column);
+
+  GeneratedColumn<double> get valorInicial => $composableBuilder(
+      column: $table.valorInicial, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fechaInicial => $composableBuilder(
+      column: $table.fechaInicial, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Titular, String> get titular =>
+      $composableBuilder(column: $table.titular, builder: (column) => column);
+
+  $$EntidadTableAnnotationComposer get entidad {
+    final $$EntidadTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableAnnotationComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  Expression<T> valoresFondoRefs<T extends Object>(
+      Expression<T> Function($$ValoresFondoTableAnnotationComposer a) f) {
+    final $$ValoresFondoTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.valoresFondo,
+        getReferencedColumn: (t) => t.fondo,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ValoresFondoTableAnnotationComposer(
+              $db: $db,
+              $table: $db.valoresFondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
 class $$FondoTableTableManager extends RootTableManager<
     _$AppDatabase,
     $FondoTable,
     FondoData,
     $$FondoTableFilterComposer,
     $$FondoTableOrderingComposer,
+    $$FondoTableAnnotationComposer,
     $$FondoTableCreateCompanionBuilder,
-    $$FondoTableUpdateCompanionBuilder> {
+    $$FondoTableUpdateCompanionBuilder,
+    (FondoData, $$FondoTableReferences),
+    FondoData,
+    PrefetchHooks Function({bool entidad, bool valoresFondoRefs})> {
   $$FondoTableTableManager(_$AppDatabase db, $FondoTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$FondoTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$FondoTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$FondoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FondoTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FondoTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -3365,126 +4264,73 @@ class $$FondoTableTableManager extends RootTableManager<
             titular: titular,
             entidad: entidad,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$FondoTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({entidad = false, valoresFondoRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (valoresFondoRefs) db.valoresFondo],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (entidad) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.entidad,
+                    referencedTable: $$FondoTableReferences._entidadTable(db),
+                    referencedColumn:
+                        $$FondoTableReferences._entidadTable(db).name,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (valoresFondoRefs)
+                    await $_getPrefetchedData<FondoData, $FondoTable,
+                            ValoresFondoData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$FondoTableReferences._valoresFondoRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$FondoTableReferences(db, table, p0)
+                                .valoresFondoRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.fondo == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
-class $$FondoTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $FondoTable> {
-  $$FondoTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get isin => $state.composableBuilder(
-      column: $state.table.isin,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get participaciones => $state.composableBuilder(
-      column: $state.table.participaciones,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get valorInicial => $state.composableBuilder(
-      column: $state.table.valorInicial,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get fechaInicial => $state.composableBuilder(
-      column: $state.table.fechaInicial,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnWithTypeConverterFilters<Titular, Titular, String> get titular =>
-      $state.composableBuilder(
-          column: $state.table.titular,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
-
-  $$EntidadTableFilterComposer get entidad {
-    final $$EntidadTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) => $$EntidadTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-
-  ComposableFilter valoresFondoRefs(
-      ComposableFilter Function($$ValoresFondoTableFilterComposer f) f) {
-    final $$ValoresFondoTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $state.db.valoresFondo,
-        getReferencedColumn: (t) => t.fondo,
-        builder: (joinBuilder, parentComposers) =>
-            $$ValoresFondoTableFilterComposer(ComposerState($state.db,
-                $state.db.valoresFondo, joinBuilder, parentComposers)));
-    return f(composer);
-  }
-}
-
-class $$FondoTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $FondoTable> {
-  $$FondoTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get isin => $state.composableBuilder(
-      column: $state.table.isin,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get participaciones => $state.composableBuilder(
-      column: $state.table.participaciones,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get valorInicial => $state.composableBuilder(
-      column: $state.table.valorInicial,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get fechaInicial => $state.composableBuilder(
-      column: $state.table.fechaInicial,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get titular => $state.composableBuilder(
-      column: $state.table.titular,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$EntidadTableOrderingComposer get entidad {
-    final $$EntidadTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.entidad,
-        referencedTable: $state.db.entidad,
-        getReferencedColumn: (t) => t.name,
-        builder: (joinBuilder, parentComposers) =>
-            $$EntidadTableOrderingComposer(ComposerState(
-                $state.db, $state.db.entidad, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
+typedef $$FondoTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $FondoTable,
+    FondoData,
+    $$FondoTableFilterComposer,
+    $$FondoTableOrderingComposer,
+    $$FondoTableAnnotationComposer,
+    $$FondoTableCreateCompanionBuilder,
+    $$FondoTableUpdateCompanionBuilder,
+    (FondoData, $$FondoTableReferences),
+    FondoData,
+    PrefetchHooks Function({bool entidad, bool valoresFondoRefs})>;
 typedef $$ValoresFondoTableCreateCompanionBuilder = ValoresFondoCompanion
     Function({
   Value<int> id,
@@ -3504,22 +4350,186 @@ typedef $$ValoresFondoTableUpdateCompanionBuilder = ValoresFondoCompanion
   Value<double?> participaciones,
 });
 
+final class $$ValoresFondoTableReferences extends BaseReferences<_$AppDatabase,
+    $ValoresFondoTable, ValoresFondoData> {
+  $$ValoresFondoTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FondoTable _fondoTable(_$AppDatabase db) => db.fondo
+      .createAlias($_aliasNameGenerator(db.valoresFondo.fondo, db.fondo.id));
+
+  $$FondoTableProcessedTableManager? get fondo {
+    final $_column = $_itemColumn<int>('fondo');
+    if ($_column == null) return null;
+    final manager = $$FondoTableTableManager($_db, $_db.fondo)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_fondoTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$ValoresFondoTableFilterComposer
+    extends Composer<_$AppDatabase, $ValoresFondoTable> {
+  $$ValoresFondoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get valor => $composableBuilder(
+      column: $table.valor, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<TipoOp?, TipoOp, String> get tipo =>
+      $composableBuilder(
+          column: $table.tipo,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<double> get participaciones => $composableBuilder(
+      column: $table.participaciones,
+      builder: (column) => ColumnFilters(column));
+
+  $$FondoTableFilterComposer get fondo {
+    final $$FondoTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.fondo,
+        referencedTable: $db.fondo,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FondoTableFilterComposer(
+              $db: $db,
+              $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ValoresFondoTableOrderingComposer
+    extends Composer<_$AppDatabase, $ValoresFondoTable> {
+  $$ValoresFondoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get valor => $composableBuilder(
+      column: $table.valor, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get tipo => $composableBuilder(
+      column: $table.tipo, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get participaciones => $composableBuilder(
+      column: $table.participaciones,
+      builder: (column) => ColumnOrderings(column));
+
+  $$FondoTableOrderingComposer get fondo {
+    final $$FondoTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.fondo,
+        referencedTable: $db.fondo,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FondoTableOrderingComposer(
+              $db: $db,
+              $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ValoresFondoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ValoresFondoTable> {
+  $$ValoresFondoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fecha =>
+      $composableBuilder(column: $table.fecha, builder: (column) => column);
+
+  GeneratedColumn<double> get valor =>
+      $composableBuilder(column: $table.valor, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoOp?, String> get tipo =>
+      $composableBuilder(column: $table.tipo, builder: (column) => column);
+
+  GeneratedColumn<double> get participaciones => $composableBuilder(
+      column: $table.participaciones, builder: (column) => column);
+
+  $$FondoTableAnnotationComposer get fondo {
+    final $$FondoTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.fondo,
+        referencedTable: $db.fondo,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FondoTableAnnotationComposer(
+              $db: $db,
+              $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
 class $$ValoresFondoTableTableManager extends RootTableManager<
     _$AppDatabase,
     $ValoresFondoTable,
     ValoresFondoData,
     $$ValoresFondoTableFilterComposer,
     $$ValoresFondoTableOrderingComposer,
+    $$ValoresFondoTableAnnotationComposer,
     $$ValoresFondoTableCreateCompanionBuilder,
-    $$ValoresFondoTableUpdateCompanionBuilder> {
+    $$ValoresFondoTableUpdateCompanionBuilder,
+    (ValoresFondoData, $$ValoresFondoTableReferences),
+    ValoresFondoData,
+    PrefetchHooks Function({bool fondo})> {
   $$ValoresFondoTableTableManager(_$AppDatabase db, $ValoresFondoTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$ValoresFondoTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$ValoresFondoTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$ValoresFondoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ValoresFondoTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ValoresFondoTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int?> fondo = const Value.absent(),
@@ -3552,93 +4562,62 @@ class $$ValoresFondoTableTableManager extends RootTableManager<
             tipo: tipo,
             participaciones: participaciones,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ValoresFondoTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({fondo = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (fondo) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.fondo,
+                    referencedTable:
+                        $$ValoresFondoTableReferences._fondoTable(db),
+                    referencedColumn:
+                        $$ValoresFondoTableReferences._fondoTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ));
 }
 
-class $$ValoresFondoTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $ValoresFondoTable> {
-  $$ValoresFondoTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get valor => $state.composableBuilder(
-      column: $state.table.valor,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnWithTypeConverterFilters<TipoOp?, TipoOp, String> get tipo =>
-      $state.composableBuilder(
-          column: $state.table.tipo,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get participaciones => $state.composableBuilder(
-      column: $state.table.participaciones,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  $$FondoTableFilterComposer get fondo {
-    final $$FondoTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.fondo,
-        referencedTable: $state.db.fondo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) => $$FondoTableFilterComposer(
-            ComposerState(
-                $state.db, $state.db.fondo, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
-class $$ValoresFondoTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $ValoresFondoTable> {
-  $$ValoresFondoTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get valor => $state.composableBuilder(
-      column: $state.table.valor,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get tipo => $state.composableBuilder(
-      column: $state.table.tipo,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get participaciones => $state.composableBuilder(
-      column: $state.table.participaciones,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$FondoTableOrderingComposer get fondo {
-    final $$FondoTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.fondo,
-        referencedTable: $state.db.fondo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) => $$FondoTableOrderingComposer(
-            ComposerState(
-                $state.db, $state.db.fondo, joinBuilder, parentComposers)));
-    return composer;
-  }
-}
-
+typedef $$ValoresFondoTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ValoresFondoTable,
+    ValoresFondoData,
+    $$ValoresFondoTableFilterComposer,
+    $$ValoresFondoTableOrderingComposer,
+    $$ValoresFondoTableAnnotationComposer,
+    $$ValoresFondoTableCreateCompanionBuilder,
+    $$ValoresFondoTableUpdateCompanionBuilder,
+    (ValoresFondoData, $$ValoresFondoTableReferences),
+    ValoresFondoData,
+    PrefetchHooks Function({bool fondo})>;
 typedef $$HistoricoTableCreateCompanionBuilder = HistoricoCompanion Function({
   Value<int> id,
   required DateTime fecha,
@@ -3654,22 +4633,109 @@ typedef $$HistoricoTableUpdateCompanionBuilder = HistoricoCompanion Function({
   Value<double> totalFondos,
 });
 
+class $$HistoricoTableFilterComposer
+    extends Composer<_$AppDatabase, $HistoricoTable> {
+  $$HistoricoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalCuentas => $composableBuilder(
+      column: $table.totalCuentas, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalDepositos => $composableBuilder(
+      column: $table.totalDepositos,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalFondos => $composableBuilder(
+      column: $table.totalFondos, builder: (column) => ColumnFilters(column));
+}
+
+class $$HistoricoTableOrderingComposer
+    extends Composer<_$AppDatabase, $HistoricoTable> {
+  $$HistoricoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalCuentas => $composableBuilder(
+      column: $table.totalCuentas,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalDepositos => $composableBuilder(
+      column: $table.totalDepositos,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalFondos => $composableBuilder(
+      column: $table.totalFondos, builder: (column) => ColumnOrderings(column));
+}
+
+class $$HistoricoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HistoricoTable> {
+  $$HistoricoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fecha =>
+      $composableBuilder(column: $table.fecha, builder: (column) => column);
+
+  GeneratedColumn<double> get totalCuentas => $composableBuilder(
+      column: $table.totalCuentas, builder: (column) => column);
+
+  GeneratedColumn<double> get totalDepositos => $composableBuilder(
+      column: $table.totalDepositos, builder: (column) => column);
+
+  GeneratedColumn<double> get totalFondos => $composableBuilder(
+      column: $table.totalFondos, builder: (column) => column);
+}
+
 class $$HistoricoTableTableManager extends RootTableManager<
     _$AppDatabase,
     $HistoricoTable,
     HistoricoData,
     $$HistoricoTableFilterComposer,
     $$HistoricoTableOrderingComposer,
+    $$HistoricoTableAnnotationComposer,
     $$HistoricoTableCreateCompanionBuilder,
-    $$HistoricoTableUpdateCompanionBuilder> {
+    $$HistoricoTableUpdateCompanionBuilder,
+    (
+      HistoricoData,
+      BaseReferences<_$AppDatabase, $HistoricoTable, HistoricoData>
+    ),
+    HistoricoData,
+    PrefetchHooks Function()> {
   $$HistoricoTableTableManager(_$AppDatabase db, $HistoricoTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$HistoricoTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$HistoricoTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$HistoricoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HistoricoTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HistoricoTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<DateTime> fecha = const Value.absent(),
@@ -3698,66 +4764,28 @@ class $$HistoricoTableTableManager extends RootTableManager<
             totalDepositos: totalDepositos,
             totalFondos: totalFondos,
           ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
         ));
 }
 
-class $$HistoricoTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $HistoricoTable> {
-  $$HistoricoTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get totalCuentas => $state.composableBuilder(
-      column: $state.table.totalCuentas,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get totalDepositos => $state.composableBuilder(
-      column: $state.table.totalDepositos,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get totalFondos => $state.composableBuilder(
-      column: $state.table.totalFondos,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-}
-
-class $$HistoricoTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $HistoricoTable> {
-  $$HistoricoTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<DateTime> get fecha => $state.composableBuilder(
-      column: $state.table.fecha,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get totalCuentas => $state.composableBuilder(
-      column: $state.table.totalCuentas,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get totalDepositos => $state.composableBuilder(
-      column: $state.table.totalDepositos,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get totalFondos => $state.composableBuilder(
-      column: $state.table.totalFondos,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-}
+typedef $$HistoricoTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $HistoricoTable,
+    HistoricoData,
+    $$HistoricoTableFilterComposer,
+    $$HistoricoTableOrderingComposer,
+    $$HistoricoTableAnnotationComposer,
+    $$HistoricoTableCreateCompanionBuilder,
+    $$HistoricoTableUpdateCompanionBuilder,
+    (
+      HistoricoData,
+      BaseReferences<_$AppDatabase, $HistoricoTable, HistoricoData>
+    ),
+    HistoricoData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

@@ -43,6 +43,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   TextEditingController cuentasController = TextEditingController();
   TextEditingController depositosController = TextEditingController();
   TextEditingController fondosController = TextEditingController();
+  TextEditingController totalController = TextEditingController();
   List<HistoricoData> historico = [];
   int alertaDepositos = 0;
 
@@ -80,9 +81,10 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
       total = totalCuentas + totalDepositos + totalFondos;
     });
     fechaController.text = FechaUtil.dateToString(date: DateTime.now());
-    cuentasController.text = totalCuentas.toString();
+    cuentasController.text = totalCuentas.toStringAsFixed(2);
     depositosController.text = totalDepositos.toString();
     fondosController.text = totalFondos.toStringAsFixed(2);
+    totalController.text = total.toStringAsFixed(2);
     await loadHistorico();
   }
 
@@ -176,6 +178,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     cuentasController.dispose();
     depositosController.dispose();
     fondosController.dispose();
+    totalController.dispose();
     super.dispose();
   }
 
@@ -562,6 +565,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: cuentasController,
+                canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.account_balance_wallet),
                   labelText: 'Cuentas',
@@ -573,6 +577,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: depositosController,
+                canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.savings),
                   labelText: 'Depósitos',
@@ -584,6 +589,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: fondosController,
+                canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.assessment),
                   labelText: 'Fondos',
@@ -592,6 +598,17 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               ),
             ),
             const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: totalController,
+                canRequestFocus: false,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.assessment),
+                  labelText: 'Total',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
             IconButton(
               onPressed: () {
                 addHistorico();
@@ -677,7 +694,7 @@ class HistoricoCartera extends StatelessWidget {
             margin: Theme.of(context).cardTheme.margin,
             alignment: AlignmentDirectional.centerEnd,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.error.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5),
               borderRadius: const BorderRadius.all(
                 Radius.circular(10),
               ),

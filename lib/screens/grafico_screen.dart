@@ -42,7 +42,7 @@ class _GraficoScreenState extends State<GraficoScreen> {
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.5), color.withOpacity(0)],
+          colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0)],
           stops: const [0.5, 1.0],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,

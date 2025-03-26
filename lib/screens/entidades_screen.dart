@@ -309,7 +309,8 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                                 child: Text(
                                   NumberUtil.porcentage(
                                     (mapEntidadTotal[entidad] ?? 1 * 100) /
-                                        sumaTotal,
+                                        sumaTotal *
+                                        100,
                                   ),
                                   style: const TextStyle(color: Colors.white),
                                 ),
