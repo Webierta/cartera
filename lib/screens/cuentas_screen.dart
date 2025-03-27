@@ -265,6 +265,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                   .firstOrNull;
 
               return Card(
+                //color: Theme.of(context).colorScheme.surface,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(

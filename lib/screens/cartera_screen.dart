@@ -282,7 +282,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: const Icon(Icons.business_center),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Balance Económico'),
         actions: [
           if (alertaDepositos > 0)
@@ -565,7 +565,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: cuentasController,
-                canRequestFocus: false,
+                //canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.account_balance_wallet),
                   labelText: 'Cuentas',
@@ -577,7 +577,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: depositosController,
-                canRequestFocus: false,
+                //canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.savings),
                   labelText: 'Depósitos',
@@ -589,7 +589,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: fondosController,
-                canRequestFocus: false,
+                //canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.assessment),
                   labelText: 'Fondos',
@@ -601,7 +601,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Expanded(
               child: TextField(
                 controller: totalController,
-                canRequestFocus: false,
+                //canRequestFocus: false,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.assessment),
                   labelText: 'Total',
@@ -730,10 +730,11 @@ class HistoricoCartera extends StatelessWidget {
                     /*child: DiaCalendario(
                       epoch: FechaUtil.dateToEpoch(historico.fecha),
                     ),*/
-                    child: Text(FechaUtil.dateToString(
-                      date: historico.fecha,
-                      formato: 'MMM yy',
-                    )),
+                    child: Text(
+                      FechaUtil.dateToString(
+                          date: historico.fecha, formato: 'MMM yy'),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
                 Expanded(

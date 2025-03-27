@@ -56,6 +56,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
         fontFamily: 'VictorMono',
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        /* bottomAppBarTheme: BottomAppBarTheme(
+          color: Theme.of(context).colorScheme.primaryContainer,
+        ), */
+        scaffoldBackgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
       builder: (context, child) {
         child = virtualWindowFrameBuilder(context, child);
