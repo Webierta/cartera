@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' as dr;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
@@ -89,7 +89,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.cuenta.name),
-        leading: IconButton(
+        /* leading: IconButton(
           onPressed: () {
             Navigator.push(
               context,
@@ -99,7 +99,7 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
             );
           },
           icon: const Icon(Icons.arrow_back),
-        ),
+        ), */
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),

@@ -1,15 +1,15 @@
+import 'package:carteradb/widgets/entidad_cuentas.dart';
 import 'package:carteradb/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
-import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import 'cartera_screen.dart';
 import 'cuenta_add_screen.dart';
-import 'cuenta_screen.dart';
+import 'entidad_screen.dart';
 
 class CuentasScreen extends ConsumerStatefulWidget {
   const CuentasScreen({super.key});
@@ -128,7 +128,8 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
   Set<String> entidadesSet = {};
   //double saldoEntidad = 0;
   //Map<CuentaData, double> cuentaSaldo = {};
-  Map<CuentaData, SaldosCuentaData> mapCuentaSaldo = {};
+
+  //Map<CuentaData, SaldosCuentaData> mapCuentaSaldo = {};
   Map<String, double> entidadSaldo = {};
   List<EntidadData> entidades = [];
 
@@ -137,7 +138,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
     database = ref.read(AppDatabase.provider);
     getSaldoTotal();
     getEntidadesSet();
-    getCuentaSaldo();
+    //getCuentaSaldo();
     super.initState();
   }
 
@@ -159,7 +160,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
     });
   }
 
-  Future<void> getCuentaSaldo() async {
+  /* Future<void> getCuentaSaldo() async {
     for (var cuenta in widget.cuentas) {
       List<SaldosCuentaData> saldosCuenta = await database.getSaldos(cuenta.id);
       if (saldosCuenta.isNotEmpty) {
@@ -168,7 +169,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
         });
       }
     }
-  }
+  } */
 
   Future<void> getEntidadSaldo() async {
     //getEntidadesSet();
@@ -259,7 +260,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
             itemCount: entidadesSet.length,
             itemBuilder: (context, indice) {
               final String entidad = entidadesSet.elementAt(indice);
-              final entidadLogo = entidades
+              final entidadData = entidades
                   .where((e) => e.name == entidad)
                   .toList()
                   .firstOrNull;
@@ -274,14 +275,29 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: CircleAvatar(
-                              backgroundImage:
-                                  BackgroundImage.getImage(entidadLogo),
+                            child: InkWell(
+                              onTap: () {
+                                entidadData != null
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EntidadScreen(
+                                                entidad: entidadData)))
+                                    : null;
+                              },
+                              child: CircleAvatar(
+                                backgroundImage:
+                                    BackgroundImage.getImage(entidadData),
+                              ),
                             ),
                           ),
-                          Text(
-                            entidad,
-                            style: const TextStyle(fontSize: 20),
+                          Row(
+                            children: [
+                              Text(
+                                entidad,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ],
                           ),
                           const Spacer(),
                           Text(
@@ -290,53 +306,8 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                           ),
                         ],
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: widget.cuentas.length,
-                        itemBuilder: (context, index) {
-                          final cuenta = widget.cuentas[index];
-                          if (cuenta.entidad != entidad) {
-                            return const SizedBox(height: 0);
-                          }
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CuentaScreen(cuenta: cuenta),
-                                ),
-                              );
-                            },
-                            //leading: CircleAvatar(child: Text(entidad[0])),
-                            leading: CircleAvatar(
-                              child: Text(cuenta.name[0].toUpperCase(),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium),
-                            ),
-                            title: Text(cuenta.name),
-                            subtitle: Text(cuenta.iban),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  NumberUtil.currency(
-                                      mapCuentaSaldo[cuenta]?.saldo ?? 0),
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                if (mapCuentaSaldo[cuenta]?.fecha != null)
-                                  Text(
-                                    FechaUtil.dateToString(
-                                      date: mapCuentaSaldo[cuenta]!.fecha,
-                                      formato: 'MMM yy',
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      if (entidadData != null)
+                        EntidadCuentas(entidad: entidadData),
                     ],
                   ),
                 ),

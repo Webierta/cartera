@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
-import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/entidad_fondos.dart';
 import '../widgets/menu.dart';
 import 'cartera_screen.dart';
+import 'entidad_screen.dart';
 import 'fondo_add_screen.dart';
-import 'fondo_screen.dart';
 
 class FondosScreen extends ConsumerStatefulWidget {
   const FondosScreen({super.key});
@@ -260,7 +260,11 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
             itemCount: entidadesSet.length,
             itemBuilder: (context, indice) {
               final entidad = entidadesSet.elementAt(indice);
-              final entidadLogo = entidades
+              /* final entidadLogo = entidades
+                  .where((e) => e.name == entidad)
+                  .toList()
+                  .firstOrNull; */
+              final entidadData = entidades
                   .where((e) => e.name == entidad)
                   .toList()
                   .firstOrNull;
@@ -274,9 +278,21 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: CircleAvatar(
-                              backgroundImage:
-                                  BackgroundImage.getImage(entidadLogo),
+                            child: InkWell(
+                              onTap: () {
+                                entidadData != null
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EntidadScreen(
+                                                  entidad: entidadData,
+                                                )))
+                                    : null;
+                              },
+                              child: CircleAvatar(
+                                backgroundImage:
+                                    BackgroundImage.getImage(entidadData),
+                              ),
                             ),
                           ),
                           Text(
@@ -290,64 +306,8 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                           ),
                         ],
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: widget.fondos.length,
-                        itemBuilder: (context, index) {
-                          final fondo = widget.fondos[index];
-                          if (fondo.entidad != entidad) {
-                            return const SizedBox(height: 0);
-                          }
-                          /*List<ValorFondo> valores = [];
-                          valores.addAll(fondo.valores);
-                          if (valores.length > 1) {
-                            valores.sort((a, b) => a.fecha.compareTo(b.fecha));
-                          }*/
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      FondoScreen(fondo: fondo),
-                                ),
-                              );
-                            },
-                            leading: CircleAvatar(
-                              child: Text(fondo.name[0].toUpperCase(),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium),
-                            ),
-                            title: Text(fondo.name),
-                            subtitle: Text(fondo.isin ?? ''),
-                            trailing: FutureBuilder(
-                              future: database.getValores(fondo.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  final valoresFondo = snapshot.data!;
-                                  Stats stats = Stats(valoresFondo);
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                          NumberUtil.currency(
-                                              stats.resultado() ?? 0),
-                                          style: const TextStyle(fontSize: 14)),
-                                      if (valoresFondo.isNotEmpty)
-                                        Text(FechaUtil.dateToString(
-                                          date: valoresFondo.first.fecha,
-                                          formato: 'MMM yy',
-                                        )),
-                                    ],
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                      if (entidadData != null)
+                        EntidadFondos(entidad: entidadData),
                     ],
                   ),
                 ),

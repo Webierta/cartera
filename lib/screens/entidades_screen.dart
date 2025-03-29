@@ -1,10 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
 import '../utils/number_util.dart';
+import '../utils/stats.dart';
+import '../widgets/entidad_card.dart';
 import 'cartera_screen.dart';
 import 'entidad_add_screen.dart';
 
@@ -15,6 +16,7 @@ class EntidadesScreen extends ConsumerStatefulWidget {
 }
 
 class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
+  final ScrollController _scrollController = ScrollController();
   late AppDatabase database;
   List<EntidadData> entidades = [];
   Map<EntidadData, double> mapEntidadTotal = {};
@@ -36,9 +38,7 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
       database.addEntidades();
       entidadesList = await database.allEntidades;
     }
-    setState(() {
-      entidades = entidadesList;
-    });
+    setState(() => entidades = entidadesList);
     loadTotales();
   }
 
@@ -83,11 +83,13 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
     double capital = 0;
     for (var fondo in fondos) {
       final valoresFondo = await database.getValores(fondo.id);
-      if (valoresFondo.isEmpty) {
+      Stats stats = Stats(valoresFondo);
+      capital += stats.resultado() ?? 0;
+      /* if (valoresFondo.isEmpty) {
         capital += fondo.participaciones * fondo.valorInicial;
       } else {
         capital += fondo.participaciones * valoresFondo.first.valor;
-      }
+      } */
     }
     return capital;
   }
@@ -116,21 +118,31 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
     });
   }
 
+  void moveScroll() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.minScrollExtent,
+          duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+    });
+  }
+
   void sortByTotal() async {
     var sortedMapEntidadTotal = Map.fromEntries(mapEntidadTotal.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value)));
     setState(() {
       entidades = sortedMapEntidadTotal.keys.toList();
     });
+    moveScroll();
   }
 
   void sortByName() {
     setState(() {
       entidades.sort(((a, b) => a.name.compareTo(b.name)));
     });
+    moveScroll();
   }
 
-  Future<bool> tieneProducto(EntidadData entidad) async {
+  /* Future<bool> tieneProducto(EntidadData entidad) async {
     var cuentas = await database.allCuentas;
     var cuentasEntidad =
         cuentas.where((cuenta) => cuenta.entidad == entidad.name);
@@ -149,7 +161,7 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
       return true;
     }
     return false;
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -170,15 +182,11 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
         title: const Text('Entidades'),
         actions: [
           IconButton(
-            onPressed: () {
-              sortByTotal();
-            },
+            onPressed: sortByTotal,
             icon: const Icon(Icons.sort),
           ),
           IconButton(
-            onPressed: () {
-              sortByName();
-            },
+            onPressed: sortByName,
             icon: const Icon(Icons.sort_by_alpha),
           ),
         ],
@@ -200,146 +208,24 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                     ),
                   ),
                   trailing: CircleAvatar(
-                    child: Text(
-                      '${entidades.length}',
-                    ),
+                    child: Text('${entidades.length}'),
                   ),
                 ),
               )
             ],
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: entidades.length,
-              itemBuilder: (context, index) {
-                final entidad = entidades[index];
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 180,
-                          height: 180,
-                          child: File(entidad.logo).existsSync()
-                              ? Image.file(File(entidad.logo))
-                              : Image.asset('assets/account_balance.png'),
-                        ),
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.topLeft,
-                            child: Row(
-                              //mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height: 180,
-                                  padding: const EdgeInsets.only(left: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EntidadAddScreen(
-                                                          editEntidad: entidad),
-                                                ),
-                                              );
-                                            },
-                                            child: Text(
-                                              entidad.name,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .displaySmall!
-                                                  .copyWith(color: Colors.blue),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        entidad.bic ?? '',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelLarge,
-                                      ),
-                                      const Spacer(),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          SelectableText(entidad.web ?? ''),
-                                          SelectableText(entidad.phone ?? ''),
-                                          SelectableText(entidad.email ?? ''),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 180,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ProductoEntidad(
-                                icon: Icons.account_balance,
-                                suma: mapEntidadTotal[entidad] ?? 0,
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                color: Theme.of(context).colorScheme.primary,
-                                child: Text(
-                                  NumberUtil.porcentage(
-                                    (mapEntidadTotal[entidad] ?? 1 * 100) /
-                                        sumaTotal *
-                                        100,
-                                  ),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              const Spacer(),
-                              ProductoEntidad(
-                                icon: Icons.account_balance_wallet,
-                                suma: mapEntidadCuentas[entidad] ?? 0,
-                              ),
-                              const SizedBox(height: 6),
-                              ProductoEntidad(
-                                icon: Icons.savings,
-                                suma: mapEntidadDepositos[entidad] ?? 0,
-                              ),
-                              const SizedBox(height: 6),
-                              ProductoEntidad(
-                                icon: Icons.assessment,
-                                suma: mapEntidadFondos[entidad] ?? 0,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          if (entidades.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(20),
+                controller: _scrollController,
+                itemCount: entidades.length,
+                itemBuilder: (context, index) {
+                  final entidad = entidades[index];
+                  return EntidadCard(entidad: entidad);
+                },
+              ),
             ),
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

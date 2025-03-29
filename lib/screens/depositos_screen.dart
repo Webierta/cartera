@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
-import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/entidad_depositos.dart';
 import '../widgets/menu.dart';
 import 'cartera_screen.dart';
 import 'deposito_add_screen.dart';
-import 'deposito_screen.dart';
+import 'entidad_screen.dart';
 
 class DepositosScreen extends ConsumerStatefulWidget {
+  //final EntidadData? entidadSelect;
   const DepositosScreen({super.key});
 
   @override
@@ -212,7 +213,7 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
               itemCount: entidadesSet.length,
               itemBuilder: (context, index) {
                 final entidad = entidadesSet.elementAt(index);
-                final entidadLogo = entidades
+                final entidadData = entidades
                     .where((e) => e.name == entidad)
                     .toList()
                     .firstOrNull;
@@ -226,17 +227,29 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(right: 10),
-                              child: CircleAvatar(
-                                /* backgroundImage: AssetImage(entidadLogo?.logo ??
-                                    'assets/account_balance.png'),*/
-                                //backgroundImage: backgroundImage(entidadLogo),
-                                backgroundImage:
-                                    BackgroundImage.getImage(entidadLogo),
-                                /*backgroundImage:
-                                    File(entidadLogo!.logo).existsSync()
-                                        ? FileImage(File(entidadLogo.logo))
-                                        : const AssetImage(
-                                            'assets/account_balance.png'),*/
+                              child: InkWell(
+                                onTap: () {
+                                  entidadData != null
+                                      ? Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EntidadScreen(
+                                                      entidad: entidadData)))
+                                      : null;
+                                },
+                                child: CircleAvatar(
+                                  /* backgroundImage: AssetImage(entidadLogo?.logo ??
+                                      'assets/account_balance.png'),*/
+                                  //backgroundImage: backgroundImage(entidadLogo),
+                                  backgroundImage:
+                                      BackgroundImage.getImage(entidadData),
+                                  /*backgroundImage:
+                                      File(entidadLogo!.logo).existsSync()
+                                          ? FileImage(File(entidadLogo.logo))
+                                          : const AssetImage(
+                                              'assets/account_balance.png'),*/
+                                ),
                               ),
                             ),
                             Text(
@@ -251,59 +264,8 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                             ),
                           ],
                         ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: widget.depositos.length,
-                          itemBuilder: (context, index) {
-                            final deposito = widget.depositos[index];
-                            if (deposito.entidad != entidad) {
-                              return const SizedBox(height: 0);
-                            }
-                            return ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DepositoScreen(deposito: deposito),
-                                  ),
-                                );
-                              },
-                              //leading: CircleAvatar(child: Text(entidad[0])),
-                              leading: CircleAvatar(
-                                child: Text(deposito.name[0].toUpperCase(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium),
-                              ),
-                              title: Text(deposito.name),
-                              subtitle: Text(deposito.codigo ?? ''),
-                              trailing: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    NumberUtil.currency(deposito.imposicion),
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  Text(
-                                    FechaUtil.dateToString(
-                                      date: deposito.vencimiento,
-                                      formato: 'd/MM/yy',
-                                    ),
-                                    style: TextStyle(
-                                      color: deposito.vencimiento
-                                                  .difference(DateTime.now())
-                                                  .inDays <
-                                              30
-                                          ? Colors.red
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                        if (entidadData != null)
+                          EntidadDepositos(entidad: entidadData),
                       ],
                     ),
                   ),
