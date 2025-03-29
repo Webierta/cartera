@@ -9,7 +9,9 @@ import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import 'cartera_screen.dart';
 import 'cuenta_add_screen.dart';
+import 'depositos_screen.dart';
 import 'entidad_screen.dart';
+import 'fondos_screen.dart';
 
 class CuentasScreen extends ConsumerStatefulWidget {
   const CuentasScreen({super.key});
@@ -68,6 +70,30 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
           icon: const Icon(Icons.home),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DepositosScreen(),
+                ),
+              );
+            },
+            tooltip: 'Ir a Depósitos',
+            icon: const Icon(Icons.savings),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FondosScreen(),
+                ),
+              );
+            },
+            tooltip: 'Ir a Fondos',
+            icon: const Icon(Icons.assessment),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             offset: Offset(0.0, AppBar().preferredSize.height),
