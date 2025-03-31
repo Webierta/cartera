@@ -13,6 +13,7 @@ import '../utils/local_storage.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/grafico_pastel.dart';
 import '../widgets/menu.dart';
 import 'cuentas_screen.dart';
 import 'depositos_screen.dart';
@@ -38,6 +39,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   double totalDepositos = 0;
   double totalFondos = 0;
   double total = 0;
+  bool loadTotales = false;
 
   TextEditingController fechaController = TextEditingController();
   TextEditingController cuentasController = TextEditingController();
@@ -79,6 +81,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     await loadFondos();
     setState(() {
       total = totalCuentas + totalDepositos + totalFondos;
+      loadTotales = true;
     });
     fechaController.text = FechaUtil.dateToString(date: DateTime.now());
     cuentasController.text = totalCuentas.toStringAsFixed(2);
@@ -142,9 +145,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     for (var deposito in depositos) {
       imposicion += deposito.imposicion;
     }
-    setState(() {
-      totalDepositos = imposicion;
-    });
+    setState(() => totalDepositos = imposicion);
   }
 
   Future<void> loadFondos() async {
@@ -355,131 +356,155 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            ListTile(
-              visualDensity: const VisualDensity(vertical: 4),
-              leading: Tooltip(
-                message: sharedPrefs.dbPath,
-                //message: database.,
-                child: const Icon(Icons.business_center, size: 40),
-              ),
-              title: const Text(
-                'Cartera',
-                style: TextStyle(fontSize: 22),
-              ),
-              trailing: Text(
-                NumberUtil.currency(
-                    totalCuentas + totalDepositos + totalFondos),
-                style: const TextStyle(fontSize: 22),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CuentasScreen(),
-                  ),
-                );
-              },
-              //dense: true,
-              visualDensity: const VisualDensity(vertical: 4),
-              leading: const Icon(Icons.account_balance_wallet, size: 40),
-              title: const Text(
-                'Cuentas',
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Text('${cuentas.length}'),
-              trailing: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    NumberUtil.currency(totalCuentas),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    color: Theme.of(context).colorScheme.primary,
-                    child: Text(
-                      NumberUtil.porcentage(
-                        (totalCuentas * 100) / total,
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    //crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ListTile(
+                        visualDensity: const VisualDensity(vertical: 4),
+                        leading: Tooltip(
+                          message: sharedPrefs.dbPath,
+                          //message: database.,
+                          child: const Icon(Icons.business_center, size: 40),
+                        ),
+                        title: const Text(
+                          'Cartera',
+                          style: TextStyle(fontSize: 22),
+                        ),
+                        trailing: Text(
+                          NumberUtil.currency(
+                              totalCuentas + totalDepositos + totalFondos),
+                          style: const TextStyle(fontSize: 22),
+                        ),
                       ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DepositosScreen(),
-                  ),
-                );
-              },
-              visualDensity: const VisualDensity(vertical: 4),
-              leading: const Icon(Icons.savings, size: 40),
-              title: const Text(
-                'Depósitos',
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Text('${depositos.length}'),
-              trailing: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    NumberUtil.currency(totalDepositos),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    color: Theme.of(context).colorScheme.primary,
-                    child: Text(
-                      NumberUtil.porcentage(
-                        (totalDepositos * 100) / total,
+                      ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CuentasScreen(),
+                            ),
+                          );
+                        },
+                        //dense: true,
+                        visualDensity: const VisualDensity(vertical: 4),
+                        leading:
+                            const Icon(Icons.account_balance_wallet, size: 40),
+                        title: const Text(
+                          'Cuentas',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        subtitle: Text('${cuentas.length}'),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              NumberUtil.currency(totalCuentas),
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              color: Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                NumberUtil.porcentage(
+                                  (totalCuentas * 100) / total,
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FondosScreen(),
-                  ),
-                );
-              },
-              visualDensity: const VisualDensity(vertical: 4),
-              leading: const Icon(Icons.assessment, size: 40),
-              title: const Text(
-                'Fondos',
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Text('${fondos.length}'),
-              trailing: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    NumberUtil.currency(totalFondos),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    color: Theme.of(context).colorScheme.primary,
-                    child: Text(
-                      NumberUtil.porcentage(
-                        (totalFondos * 100) / total,
+                      ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DepositosScreen(),
+                            ),
+                          );
+                        },
+                        visualDensity: const VisualDensity(vertical: 4),
+                        leading: const Icon(Icons.savings, size: 40),
+                        title: const Text(
+                          'Depósitos',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        subtitle: Text('${depositos.length}'),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              NumberUtil.currency(totalDepositos),
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              color: Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                NumberUtil.porcentage(
+                                  (totalDepositos * 100) / total,
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                      ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FondosScreen(),
+                            ),
+                          );
+                        },
+                        visualDensity: const VisualDensity(vertical: 4),
+                        leading: const Icon(Icons.assessment, size: 40),
+                        title: const Text(
+                          'Fondos',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        subtitle: Text('${fondos.length}'),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              NumberUtil.currency(totalFondos),
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              color: Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                NumberUtil.porcentage(
+                                  (totalFondos * 100) / total,
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                if (loadTotales)
+                  Expanded(
+                      flex: 1,
+                      child: GraficoPastel(
+                        porcentajeCuentas: (totalCuentas * 100) / total,
+                        porcentajeDepositos: (totalDepositos * 100) / total,
+                        porcentajeFondos: (totalFondos * 100) / total,
+                      )),
+              ],
             ),
             const SizedBox(height: 20),
             Container(

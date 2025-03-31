@@ -32,9 +32,7 @@ void main() async {
   final LocalStorage sharedPrefs = LocalStorage();
   await sharedPrefs.init();
   sharedPrefs.dbPath = await DbTransfer.getDbPath();
-  runApp(
-    const Iterum(child: ProviderScope(child: MyApp())),
-  );
+  runApp(const Iterum(child: ProviderScope(child: MyApp())));
 }
 
 class MyApp extends StatelessWidget {
