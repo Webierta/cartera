@@ -7,11 +7,13 @@ class GraficoPastel extends StatefulWidget {
   final double porcentajeCuentas;
   final double porcentajeDepositos;
   final double porcentajeFondos;
+  final int? touchedIndex;
   const GraficoPastel({
     super.key,
     required this.porcentajeCuentas,
     required this.porcentajeDepositos,
     required this.porcentajeFondos,
+    this.touchedIndex,
   });
 
   @override
@@ -20,6 +22,12 @@ class GraficoPastel extends StatefulWidget {
 
 class _GraficoPastelState extends State<GraficoPastel> {
   int touchedIndex = -1;
+
+  @override
+  void initState() {
+    touchedIndex = widget.touchedIndex ?? -1;
+    super.initState();
+  }
 
   List<PieChartSectionData> showingSections() {
     return List.generate(3, (i) {
