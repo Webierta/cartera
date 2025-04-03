@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' as dr;
 import 'package:flutter/material.dart';
 import 'package:flutter_iterum/flutter_iterum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as path;
 
 import '../services/app_database.dart';
 import '../services/db_transfer.dart';
@@ -20,6 +21,7 @@ import 'depositos_screen.dart';
 import 'entidades_screen.dart';
 import 'fondos_screen.dart';
 import 'grafico_screen.dart';
+import 'settings_screen.dart';
 import 'tabla_screen.dart';
 
 class CarteraScreen extends ConsumerStatefulWidget {
@@ -80,6 +82,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     await loadCuentas();
     await loadDepositos();
     await loadFondos();
+    if (!mounted) return;
     setState(() {
       total = totalCuentas + totalDepositos + totalFondos;
       loadTotales = true;
@@ -94,6 +97,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
 
   Future<void> loadCuentas() async {
     final allCuentas = await database.allCuentas;
+    if (!mounted) return;
     setState(() {
       cuentas = allCuentas;
     });
@@ -130,6 +134,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
 
   Future<void> loadDepositos() async {
     final allDepositos = await database.allDepositos;
+    if (!mounted) return;
     setState(() => depositos = allDepositos);
     checkAlertaDepositos();
     getImposicionTotal();
@@ -145,6 +150,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
 
   Future<void> loadFondos() async {
     final allFondos = await database.allFondos;
+    if (!mounted) return;
     setState(() => fondos = allFondos);
     await getCapitalTotal();
   }
@@ -212,7 +218,9 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     String content = 'Base de datos exportada';
     final DbTransfer dbTransfer = DbTransfer();
     await dbTransfer.init();
-    final File? fileExport = await dbTransfer.export();
+    String directorio = path.dirname(sharedPrefs.dbPath);
+    final File? fileExport = await dbTransfer.export(directorio);
+    //await database.exportInto(fileExport);
     if (fileExport != null) {
       await database.exportInto(fileExport);
     } else {
@@ -328,7 +336,8 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             itemBuilder: (ctx) => [
               MenuItem.buildMenuItem(Menu.exportar),
               MenuItem.buildMenuItem(Menu.importar, divider: true),
-              MenuItem.buildMenuItem(Menu.eliminar),
+              MenuItem.buildMenuItem(Menu.eliminar, divider: true),
+              MenuItem.buildMenuItem(Menu.ajustes),
               //MenuItem.buildMenuItem(Menu.info),
             ],
             onSelected: (item) async {
@@ -338,6 +347,13 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                 dbImport();
               } else if (item == Menu.eliminar) {
                 dbDelete();
+              } else if (item == Menu.ajustes) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
               }
               /*else if (item == Menu.info) {
                 showInfo();
@@ -389,8 +405,13 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                           },
                           //dense: true,
                           visualDensity: const VisualDensity(vertical: 4),
-                          leading: const Icon(Icons.account_balance_wallet,
-                              size: 40),
+                          leading: Icon(
+                            Icons.account_balance_wallet,
+                            size: 40,
+                            color: touchedIndex == 0
+                                ? Colors.blue
+                                : const IconThemeData().color,
+                          ),
                           title: Text(
                             'Cuentas',
                             style: TextStyle(
@@ -435,7 +456,13 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                             );
                           },
                           visualDensity: const VisualDensity(vertical: 4),
-                          leading: const Icon(Icons.savings, size: 40),
+                          leading: Icon(
+                            Icons.savings,
+                            size: 40,
+                            color: touchedIndex == 1
+                                ? Colors.green
+                                : const IconThemeData().color,
+                          ),
                           title: Text(
                             'Depósitos',
                             style: TextStyle(
@@ -480,7 +507,13 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                             );
                           },
                           visualDensity: const VisualDensity(vertical: 4),
-                          leading: const Icon(Icons.assessment, size: 40),
+                          leading: Icon(
+                            Icons.assessment,
+                            size: 40,
+                            color: touchedIndex == 2
+                                ? Colors.red
+                                : const IconThemeData().color,
+                          ),
                           title: Text(
                             'Fondos',
                             style: TextStyle(
@@ -515,7 +548,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                     ],
                   ),
                 ),
-                if (loadTotales)
+                if (loadTotales && total > 0)
                   Expanded(
                     flex: 1,
                     child: GraficoPastel(

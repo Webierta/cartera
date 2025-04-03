@@ -14,12 +14,10 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:riverpod/riverpod.dart';
 
 import '../utils/entidades.dart';
 import '../utils/local_storage.dart';
-import 'db_transfer.dart';
 import 'tablas.dart';
 
 part 'app_database.g.dart';
@@ -336,7 +334,7 @@ class AppDatabase extends _$AppDatabase {
       String fileName = 'cartera_db.sqlite';
       final file = File(join(dirApp.path, fileName));*/
 
-      String dbPathDb = await DbTransfer.getDbPath();
+      /* String dbPathDb = await DbTransfer.getDbPath();
       var file = File(dbPathDb);
 
       final LocalStorage sharedPrefs = LocalStorage();
@@ -349,12 +347,12 @@ class AppDatabase extends _$AppDatabase {
         await file.writeAsBytes(
             buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
         sharedPrefs.dbPath = await DbTransfer.getDbPath();
-      }
+      } */
 
-      /*final LocalStorage sharedPrefs = LocalStorage();
+      final LocalStorage sharedPrefs = LocalStorage();
       await sharedPrefs.init();
       String dbPath = sharedPrefs.dbPath;
-      final file = File(dbPath);*/
+      final file = File(dbPath);
 
       return NativeDatabase.createInBackground(file);
     });

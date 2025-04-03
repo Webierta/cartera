@@ -3,8 +3,8 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../utils/fecha_util.dart';
 
@@ -27,13 +27,32 @@ class DbTransfer {
     return join(dirApp.path, fileName);
   }
 
-  Future<File?> export() async {
-    final fecha =
-        FechaUtil.dateToString(date: DateTime.now(), formato: 'ddMMyy');
+  Future<File?> export(String directorio) async {
+    //File export(String directorio) {
+    final fecha = FechaUtil.dateToString(
+      date: DateTime.now(),
+      formato: 'ddMMyy',
+    );
+    String fileName = 'cartera_db$fecha.sqlite';
+
+    //Directory dir = await getApplicationDocumentsDirectory();
+    //_dirBackup ??=  await Directory('${dir.path}/carteraDB2/').create(recursive: true);
+
     try {
+      var directorioBackup =
+          await Directory('$directorio/backup/').create(recursive: true);
+      String pathToFile = join(directorioBackup.path, fileName);
+      File file = File(pathToFile);
+      return file;
+    } catch (e) {
+      return null;
+    }
+
+    /* try {
       final directorio = await FilePicker.platform.getDirectoryPath(
         initialDirectory: _dirBackup?.path,
-      );
+      ); 
+       //final directorio = 
       if (directorio != null) {
         //File file = File(result.files.single.path!);
         String fileName = 'cartera_db$fecha.sqlite';
@@ -45,7 +64,7 @@ class DbTransfer {
       }
     } catch (e) {
       return null;
-    }
+    } */
   }
 
   Future<File?> import() async {

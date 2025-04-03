@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'screens/cartera_screen.dart';
-import 'services/db_transfer.dart';
+import 'screens/login_screen.dart';
 import 'utils/local_storage.dart';
 
 void main() async {
@@ -31,12 +31,31 @@ void main() async {
 
   final LocalStorage sharedPrefs = LocalStorage();
   await sharedPrefs.init();
-  sharedPrefs.dbPath = await DbTransfer.getDbPath();
+  //sharedPrefs.dbPath = await DbTransfer.getDbPath();
   runApp(const Iterum(child: ProviderScope(child: MyApp())));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool loginRequerido = false;
+  final LocalStorage sharedPrefs = LocalStorage();
+
+  @override
+  void initState() {
+    initLocalStorage();
+    super.initState();
+  }
+
+  initLocalStorage() async {
+    await sharedPrefs.init();
+    setState(() => loginRequerido = sharedPrefs.loginRequerido);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +86,9 @@ class MyApp extends StatelessWidget {
         child = virtualWindowFrameBuilder(context, child);
         return child;
       },
-      home: const CarteraScreen(),
+      home: loginRequerido ? const LoginScreen() : const CarteraScreen(),
+      //home: const CarteraScreen(),
+      //home: const LoginScreen(),
     );
   }
 }

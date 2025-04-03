@@ -5,7 +5,8 @@ enum Menu {
   importar(Icons.file_download),
   eliminar(Icons.delete_forever),
   editar(Icons.edit),
-  limpiar(Icons.cleaning_services);
+  limpiar(Icons.cleaning_services),
+  ajustes(Icons.settings);
   //info(Icons.info);
 
   final IconData icon;
