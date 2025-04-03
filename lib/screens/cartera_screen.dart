@@ -217,7 +217,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   Future<void> dbExport() async {
     String content = 'Base de datos exportada';
     final DbTransfer dbTransfer = DbTransfer();
-    await dbTransfer.init();
+    //await dbTransfer.init();
     String directorio = path.dirname(sharedPrefs.dbPath);
     final File? fileExport = await dbTransfer.export(directorio);
     //await database.exportInto(fileExport);
@@ -240,12 +240,12 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
       'perderán y no podrán ser recuperados.\n\n'
       'Se recomienda exportar una copia de seguridad antes de importar.\n\n'
       'Después de completar el proceso, la aplicación se reiniciará para '
-      'aplicar los cambios.\n\n'
+      'aplicar los cambios (si no se reinicia, cierra y ejecuta de nuevo).\n\n'
       '¿Continuar con el proceso de importación?',
     );
     if (confirm == true) {
       final DbTransfer dbTransfer = DbTransfer();
-      await dbTransfer.init();
+      //await dbTransfer.init();
       final File? fileImport = await dbTransfer.import();
       if (fileImport != null) {
         sharedPrefs.dbPath = fileImport.path;

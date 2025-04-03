@@ -334,6 +334,7 @@ class AppDatabase extends _$AppDatabase {
       String fileName = 'cartera_db.sqlite';
       final file = File(join(dirApp.path, fileName));*/
 
+      // ORIGINAL
       /* String dbPathDb = await DbTransfer.getDbPath();
       var file = File(dbPathDb);
 

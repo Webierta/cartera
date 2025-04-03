@@ -9,13 +9,13 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/fecha_util.dart';
 
 class DbTransfer {
-  static Directory? _dirBackup;
+  //static Directory? _dirBackup;
 
-  init() async {
+  /*  init() async {
     Directory dir = await getApplicationDocumentsDirectory();
     _dirBackup ??=
         await Directory('${dir.path}/carteraDB2/').create(recursive: true);
-  }
+  } */
 
   ///carteraDB/backup
 
@@ -70,8 +70,8 @@ class DbTransfer {
   Future<File?> import() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-        initialDirectory: _dirBackup?.path,
-      );
+          //initialDirectory: _dirBackup?.path,
+          );
       if (result != null) {
         File file = File(result.files.single.path!);
         if (extension(file.path) != '.sqlite') {

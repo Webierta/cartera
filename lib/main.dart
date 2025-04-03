@@ -29,8 +29,8 @@ void main() async {
     await windowManager.focus();
   });
 
-  final LocalStorage sharedPrefs = LocalStorage();
-  await sharedPrefs.init();
+  //final LocalStorage sharedPrefs = LocalStorage();
+  //await sharedPrefs.init();
   //sharedPrefs.dbPath = await DbTransfer.getDbPath();
   runApp(const Iterum(child: ProviderScope(child: MyApp())));
 }
@@ -88,7 +88,6 @@ class _MyAppState extends State<MyApp> {
       },
       home: loginRequerido ? const LoginScreen() : const CarteraScreen(),
       //home: const CarteraScreen(),
-      //home: const LoginScreen(),
     );
   }
 }
