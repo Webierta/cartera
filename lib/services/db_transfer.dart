@@ -67,11 +67,12 @@ class DbTransfer {
     } */
   }
 
-  Future<File?> import() async {
+  Future<File?> import(String directorio) async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-          //initialDirectory: _dirBackup?.path,
-          );
+        //initialDirectory: _dirBackup?.path,
+        initialDirectory: directorio,
+      );
       if (result != null) {
         File file = File(result.files.single.path!);
         if (extension(file.path) != '.sqlite') {

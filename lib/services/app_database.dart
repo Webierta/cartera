@@ -10,6 +10,9 @@ dart run drift_dev schema dump lib/services/app_database.dart db_schemas
 dart run drift_dev schema steps db_schemas lib/db_migration.dart
 */
 
+// Secure SQLite Database in Flutter using sqflite_sqlcipher
+// https://medium.com/@sumaiah.mitu/secure-sqlite-database-in-flutter-using-sqflite-sqlcipher-ffccbb008743
+
 import 'dart:io';
 
 import 'package:drift/drift.dart';

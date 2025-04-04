@@ -246,10 +246,11 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     if (confirm == true) {
       final DbTransfer dbTransfer = DbTransfer();
       //await dbTransfer.init();
-      final File? fileImport = await dbTransfer.import();
+      String directorio = path.dirname(sharedPrefs.dbPath);
+      final File? fileImport = await dbTransfer.import(directorio);
       if (fileImport != null) {
-        sharedPrefs.dbPath = fileImport.path;
         await database.close();
+        sharedPrefs.dbPath = fileImport.path;
         //sharedPrefs.dbPath = await DbTransfer.getDbPath();
         if (!mounted) return;
         Iterum.revive(context);

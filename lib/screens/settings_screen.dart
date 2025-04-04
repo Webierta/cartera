@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iterum/flutter_iterum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 
 import '../services/app_database.dart';
 import '../utils/local_storage.dart';
+import '../widgets/wave.dart';
 import 'cartera_screen.dart';
 import 'login_screen.dart';
 
@@ -21,14 +23,26 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   late AppDatabase database;
   final LocalStorage sharedPrefs = LocalStorage();
-  //bool loginRequerido = false;
-  //bool deleteUserActivo = true;
+  PackageInfo packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+    buildSignature: 'Unknown',
+    installerStore: 'Unknown',
+  );
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
     initLocalStorage();
+    initPackageInfo();
     super.initState();
+  }
+
+  Future<void> initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() => packageInfo = info);
   }
 
   initLocalStorage() async {
@@ -52,11 +66,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   cambiarRutaDb(BuildContext context) async {
-    // 1. seleccionar directorio
     try {
-      final directorio = await FilePicker.platform.getDirectoryPath(
-          //initialDirectory: _dirBackup?.path,
-          );
+      // 1. seleccionar directorio
+      final directorio = await FilePicker.platform.getDirectoryPath();
       if (directorio != null) {
         String fileName = 'cartera_db.sqlite';
         String pathToFile = join(directorio, fileName);
@@ -65,11 +77,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         await copyDb(file);
         // 4. cambiar nueva ruta en db_transfer
         //DbTransfer().setPathDb(pathToFile);
-
-        // 3. Guardar nueva ruta en local_storage
-        sharedPrefs.dbPath = pathToFile;
         // 5. reinicar app
         await database.close();
+        // 3. Guardar nueva ruta en local_storage
+        sharedPrefs.dbPath = pathToFile;
         //sharedPrefs.dbPath = await DbTransfer.getDbPath();
         if (context.mounted) {
           Iterum.revive(context);
@@ -101,54 +112,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           icon: const Icon(Icons.home),
         ),
         title: const Text('Ajustes'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text('Versión: ${packageInfo.version}'),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const ScrollPhysics(),
-        padding: const EdgeInsets.all(20),
+        //padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            ListTile(
-              leading: const Icon(Icons.storage, size: 40),
-              title: Text('Ruta de la base de datos'),
-              subtitle: Text(sharedPrefs.dbPath),
-              trailing: CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                child: InkWell(
-                  onTap: () {
-                    cambiarRutaDb(context);
-                  },
-                  child: Icon(Icons.search),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(
-                Icons.security,
-                size: 40,
-              ),
-              title: const Text('Acceso restringido con contraseña'),
-              subtitle: Text(
-                sharedPrefs.loginRequerido && sharedPrefs.userActivo.isNotEmpty
-                    ? 'Usuario activo: ${sharedPrefs.userActivo}'
-                    : 'Registra un usuario autorizado',
-              ),
-              trailing: Switch(
-                value: sharedPrefs.loginRequerido,
-                onChanged: (value) {
-                  if (value) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(registro: true),
+            const Wave(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.storage, size: 40),
+                    title: Text('Ruta de la base de datos'),
+                    subtitle: Text(sharedPrefs.dbPath),
+                    trailing: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      child: InkWell(
+                        onTap: () {
+                          cambiarRutaDb(context);
+                        },
+                        child: Icon(Icons.search),
                       ),
-                    );
-                  } else {
-                    setState(() => sharedPrefs.loginRequerido = false);
-                    deleteUser();
-                  }
-                },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.security,
+                      size: 40,
+                    ),
+                    title: const Text('Acceso restringido con contraseña'),
+                    subtitle: Text(
+                      sharedPrefs.loginRequerido &&
+                              sharedPrefs.userActivo.isNotEmpty
+                          ? 'Usuario activo: ${sharedPrefs.userActivo}'
+                          : 'Registra un usuario autorizado',
+                    ),
+                    trailing: Switch(
+                      value: sharedPrefs.loginRequerido,
+                      onChanged: (value) {
+                        if (value) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const LoginScreen(registro: true),
+                            ),
+                          );
+                        } else {
+                          setState(() => sharedPrefs.loginRequerido = false);
+                          deleteUser();
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

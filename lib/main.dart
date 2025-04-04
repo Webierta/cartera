@@ -1,3 +1,5 @@
+// flutter build linux --release
+
 import 'package:flutter/material.dart';
 import 'package:flutter_iterum/flutter_iterum.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
