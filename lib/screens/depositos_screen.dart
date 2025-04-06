@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
@@ -7,6 +8,7 @@ import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/entidad_depositos.dart';
 import '../widgets/menu.dart';
+import '../widgets/sort_buttons.dart';
 import 'cartera_screen.dart';
 import 'cuentas_screen.dart';
 import 'deposito_add_screen.dart';
@@ -23,11 +25,20 @@ class DepositosScreen extends ConsumerStatefulWidget {
 
 class _DepositosScreenState extends ConsumerState<DepositosScreen> {
   late AppDatabase database;
+  int numeroDepositos = 0;
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
+    setNumeroDepositos();
     super.initState();
+  }
+
+  setNumeroDepositos() async {
+    final depositos = await database.allDepositos;
+    setState(() {
+      numeroDepositos = depositos.length;
+    });
   }
 
   Future<void> depositosDelete(BuildContext context) async {
@@ -57,7 +68,13 @@ class _DepositosScreenState extends ConsumerState<DepositosScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Depósitos'),
+        title: Row(
+          children: [
+            const Text('Depósitos'),
+            const SizedBox(width: 20),
+            CircleAvatar(child: Text('$numeroDepositos')),
+          ],
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.push(
@@ -155,6 +172,8 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
   Map<String, double> entidadImposicion = {};
   List<EntidadData> entidades = [];
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     getImposicionTotal();
@@ -205,6 +224,34 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
     }
   }
 
+  void moveScroll() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.minScrollExtent,
+          duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+    });
+  }
+
+  void sortByCapital() {
+    var sortedEntidadTotal = Map.fromEntries(entidadImposicion.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value)));
+    setState(() {
+      entidadesSet = sortedEntidadTotal.keys.toSet();
+    });
+    moveScroll();
+  }
+
+  void sortByName() {
+    var listaEntidades = entidadesSet.toList();
+    listaEntidades.sort();
+    //listaEntidades.sort(((a, b) => a.compareTo(b)));
+    setState(() {
+      //entidadesSet.sort(((a, b) => a.name.compareTo(b.name)));
+      entidadesSet = listaEntidades.toSet();
+    });
+    moveScroll();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -223,19 +270,30 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                trailing: CircleAvatar(
+                /* trailing: CircleAvatar(
                   child: Text(
                     '${widget.depositos.length}',
                     style: const TextStyle(fontSize: 22),
                   ),
-                ),
+                ), */
+                trailing: (entidadesSet.length > 1)
+                    ? SortButtons(
+                        sortByCapital: sortByCapital,
+                        sortByName: sortByName,
+                      )
+                    : null,
               ),
             ),
           ],
         ),
+        if (entidadesSet.isEmpty)
+          const Expanded(
+            child: Center(child: Text('Ningún depósito a la vista')),
+          ),
         Expanded(
           child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 40),
+              controller: _scrollController,
               itemCount: entidadesSet.length,
               itemBuilder: (context, index) {
                 final entidad = entidadesSet.elementAt(index);
@@ -291,7 +349,8 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
                           ],
                         ),
                         if (entidadData != null)
-                          EntidadDepositos(entidad: entidadData),
+                          EntidadDepositos(
+                              entidad: entidadData, key: UniqueKey()),
                       ],
                     ),
                   ),

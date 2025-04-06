@@ -335,10 +335,10 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             offset: Offset(0.0, AppBar().preferredSize.height),
             //shape: AppBox.roundBorder,
             itemBuilder: (ctx) => [
+              MenuItem.buildMenuItem(Menu.ajustes, divider: true),
               MenuItem.buildMenuItem(Menu.exportar),
               MenuItem.buildMenuItem(Menu.importar, divider: true),
-              MenuItem.buildMenuItem(Menu.eliminar, divider: true),
-              MenuItem.buildMenuItem(Menu.ajustes),
+              MenuItem.buildMenuItem(Menu.eliminar),
               //MenuItem.buildMenuItem(Menu.info),
             ],
             onSelected: (item) async {

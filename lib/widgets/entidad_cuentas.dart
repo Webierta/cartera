@@ -62,6 +62,7 @@ class _EntidadCuentasState extends ConsumerState<EntidadCuentas> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      //key: UniqueKey(),
       shrinkWrap: true,
       itemCount: cuentasEntidad.length,
       itemBuilder: (context, index) {

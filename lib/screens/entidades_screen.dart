@@ -6,6 +6,7 @@ import '../services/app_database.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/entidad_card.dart';
+import '../widgets/sort_buttons.dart';
 import 'cartera_screen.dart';
 import 'entidad_add_screen.dart';
 
@@ -38,7 +39,10 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
       database.addEntidades();
       entidadesList = await database.allEntidades;
     }
-    setState(() => entidades = entidadesList);
+    setState(() {
+      entidades = entidadesList;
+      //ordenEntidades.lista = entidades;
+    });
     loadTotales();
   }
 
@@ -115,6 +119,7 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
       mapEntidadTotal = entidadTotal;
       sumaTotal =
           mapEntidadTotal.values.reduce((value, element) => value + element);
+      //ordenEntidades.mapa = mapEntidadTotal;
     });
   }
 
@@ -126,12 +131,13 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
     });
   }
 
-  void sortByTotal() async {
+  void sortByTotal() {
     var sortedMapEntidadTotal = Map.fromEntries(mapEntidadTotal.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value)));
     setState(() {
       entidades = sortedMapEntidadTotal.keys.toList();
     });
+
     moveScroll();
   }
 
@@ -179,17 +185,14 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
           },
           icon: const Icon(Icons.home),
         ),
-        title: const Text('Entidades'),
-        actions: [
-          IconButton(
-            onPressed: sortByTotal,
-            icon: const Icon(Icons.sort),
-          ),
-          IconButton(
-            onPressed: sortByName,
-            icon: const Icon(Icons.sort_by_alpha),
-          ),
-        ],
+        //title: const Text('Entidades'),
+        title: Row(
+          children: [
+            const Text('Entidades'),
+            const SizedBox(width: 20),
+            CircleAvatar(child: Text('${entidades.length}')),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -207,9 +210,13 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  trailing: CircleAvatar(
-                    child: Text('${entidades.length}'),
-                  ),
+                  //trailing: CircleAvatar(child: Text('${entidades.length}')),
+                  trailing: (entidades.length > 1)
+                      ? SortButtons(
+                          sortByCapital: sortByTotal,
+                          sortByName: sortByName,
+                        )
+                      : null,
                 ),
               )
             ],
@@ -222,7 +229,7 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                 itemCount: entidades.length,
                 itemBuilder: (context, index) {
                   final entidad = entidades[index];
-                  return EntidadCard(entidad: entidad);
+                  return EntidadCard(entidad: entidad, key: UniqueKey());
                 },
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
@@ -8,6 +9,7 @@ import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/entidad_fondos.dart';
 import '../widgets/menu.dart';
+import '../widgets/sort_buttons.dart';
 import 'cartera_screen.dart';
 import 'cuentas_screen.dart';
 import 'depositos_screen.dart';
@@ -22,11 +24,18 @@ class FondosScreen extends ConsumerStatefulWidget {
 
 class _FondosScreenState extends ConsumerState<FondosScreen> {
   late AppDatabase database;
+  int numeroFondos = 0;
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
+    setNumeroFondos();
     super.initState();
+  }
+
+  setNumeroFondos() async {
+    final fondos = await database.allFondos;
+    setState(() => numeroFondos = fondos.length);
   }
 
   Future<void> fondosDelete(BuildContext context) async {
@@ -57,7 +66,14 @@ class _FondosScreenState extends ConsumerState<FondosScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Fondos'),
+        //title: const Text('Fondos'),
+        title: Row(
+          children: [
+            const Text('Fondos'),
+            const SizedBox(width: 20),
+            CircleAvatar(child: Text('$numeroFondos')),
+          ],
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.push(
@@ -156,12 +172,14 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
   Set<String> entidadesSet = {};
   Map<String, double> entidadCapital = {};
   List<EntidadData> entidades = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
-    getEntidadesSet();
+    //getEntidadesSet();
     getTotalStats();
+    getEntidadesSet();
     super.initState();
   }
 
@@ -170,6 +188,7 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
     for (var fondo in widget.fondos) {
       entidadesNombres.add(fondo.entidad);
     }
+    //final database = ref.read(AppDatabase.provider);
     List<EntidadData> allEntidades = await database.allEntidades;
     setState(() {
       entidadesSet = entidadesNombres;
@@ -221,9 +240,38 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
     });
   }
 
+  void moveScroll() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.minScrollExtent,
+          duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+    });
+  }
+
+  void sortByCapital() {
+    var sortedEntidadTotal = Map.fromEntries(entidadCapital.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value)));
+    setState(() {
+      entidadesSet = sortedEntidadTotal.keys.toSet();
+    });
+    moveScroll();
+  }
+
+  void sortByName() {
+    var listaEntidades = entidadesSet.toList();
+    listaEntidades.sort();
+    //listaEntidades.sort(((a, b) => a.compareTo(b)));
+    setState(() {
+      //entidadesSet.sort(((a, b) => a.name.compareTo(b.name)));
+      entidadesSet = listaEntidades.toSet();
+    });
+    moveScroll();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
+      //key: UniqueKey(),
       children: [
         Row(
           children: [
@@ -264,12 +312,12 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                     ),
                   ],
                 ),
-                trailing: CircleAvatar(
-                  child: Text(
-                    '${widget.fondos.length}',
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
+                trailing: (entidadesSet.length > 1)
+                    ? SortButtons(
+                        sortByCapital: sortByCapital,
+                        sortByName: sortByName,
+                      )
+                    : null,
               ),
             ),
           ],
@@ -282,7 +330,9 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
           ),
         Expanded(
           child: ListView.builder(
+            //key: UniqueKey(),
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 40),
+            controller: _scrollController,
             itemCount: entidadesSet.length,
             itemBuilder: (context, indice) {
               final entidad = entidadesSet.elementAt(indice);
@@ -295,6 +345,7 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                   .toList()
                   .firstOrNull;
               return Card(
+                //key: UniqueKey(),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -333,7 +384,7 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
                         ],
                       ),
                       if (entidadData != null)
-                        EntidadFondos(entidad: entidadData),
+                        EntidadFondos(entidad: entidadData, key: UniqueKey()),
                     ],
                   ),
                 ),

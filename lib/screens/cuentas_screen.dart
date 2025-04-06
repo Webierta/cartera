@@ -1,12 +1,14 @@
 import 'package:carteradb/widgets/entidad_cuentas.dart';
 import 'package:carteradb/widgets/menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/sort_buttons.dart';
 import 'cartera_screen.dart';
 import 'cuenta_add_screen.dart';
 import 'depositos_screen.dart';
@@ -21,11 +23,20 @@ class CuentasScreen extends ConsumerStatefulWidget {
 
 class _CuentasScreenState extends ConsumerState<CuentasScreen> {
   late AppDatabase database;
+  int numeroCuentas = 0;
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
+    setNumeroCuentas();
     super.initState();
+  }
+
+  setNumeroCuentas() async {
+    final cuentas = await database.allCuentas;
+    setState(() {
+      numeroCuentas = cuentas.length;
+    });
   }
 
   Future<void> cuentasDelete(BuildContext context) async {
@@ -54,10 +65,18 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
   @override
   Widget build(BuildContext context) {
     //final database = ref.read(AppDatabase.provider);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Cuentas'),
+        //title: Text('Cuentas ($numeroCuentas)'),
+        title: Row(
+          children: [
+            const Text('Cuentas'),
+            const SizedBox(width: 20),
+            CircleAvatar(child: Text('$numeroCuentas')),
+          ],
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.push(
@@ -154,10 +173,10 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
   Set<String> entidadesSet = {};
   //double saldoEntidad = 0;
   //Map<CuentaData, double> cuentaSaldo = {};
-
   //Map<CuentaData, SaldosCuentaData> mapCuentaSaldo = {};
   Map<String, double> entidadSaldo = {};
   List<EntidadData> entidades = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -229,6 +248,34 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
     getEntidadSaldo();
   }
 
+  void moveScroll() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.minScrollExtent,
+          duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+    });
+  }
+
+  void sortBySaldo() {
+    var sortedEntidadTotal = Map.fromEntries(entidadSaldo.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value)));
+    setState(() {
+      entidadesSet = sortedEntidadTotal.keys.toSet();
+    });
+    moveScroll();
+  }
+
+  void sortByName() {
+    var listaEntidades = entidadesSet.toList();
+    listaEntidades.sort();
+    //listaEntidades.sort(((a, b) => a.compareTo(b)));
+    setState(() {
+      //entidadesSet.sort(((a, b) => a.name.compareTo(b.name)));
+      entidadesSet = listaEntidades.toSet();
+    });
+    moveScroll();
+  }
+
   /*getSaldoEntidad(String entidad) async {
     double saldo = 0;
     for (var cuenta in widget.cuentas) {
@@ -255,7 +302,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
             Expanded(
               child: ListTile(
                 leading: const CircleAvatar(
-                  child: Icon(Icons.account_balance_wallet),
+                  child: Icon(Icons.account_balance_wallet, size: 40),
                 ),
                 title: Text(
                   NumberUtil.currency(saldoTotal),
@@ -264,12 +311,12 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                trailing: CircleAvatar(
-                  child: Text(
-                    '${widget.cuentas.length}',
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
+                trailing: (entidadesSet.length > 1)
+                    ? SortButtons(
+                        sortByCapital: sortBySaldo,
+                        sortByName: sortByName,
+                      )
+                    : null,
               ),
             ),
           ],
@@ -282,7 +329,9 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
           ),
         Expanded(
           child: ListView.builder(
+            //key: UniqueKey(),
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 40),
+            controller: _scrollController,
             itemCount: entidadesSet.length,
             itemBuilder: (context, indice) {
               final String entidad = entidadesSet.elementAt(indice);
@@ -333,7 +382,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                         ],
                       ),
                       if (entidadData != null)
-                        EntidadCuentas(entidad: entidadData),
+                        EntidadCuentas(entidad: entidadData, key: UniqueKey()),
                     ],
                   ),
                 ),

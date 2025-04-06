@@ -116,6 +116,21 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(widget.registro == true ? 'Registro' : 'Login'),
+        actions: [
+          if (widget.registro == true)
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Tooltip(
+                padding: EdgeInsets.all(12),
+                message: 'Recuerda que aunque el acceso a la base de datos\n'
+                    'desde esta aplicación quede protegido con contraseña,\n'
+                    'el archivo no será encriptado y puede ser accesible\n'
+                    'desde otras aplicaciones.\n\n'
+                    'Guárdalo en lugar seguro',
+                child: Icon(Icons.info),
+              ),
+            )
+        ],
       ),
       body: SingleChildScrollView(
         physics: const ScrollPhysics(),

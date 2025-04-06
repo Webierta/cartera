@@ -83,6 +83,11 @@ class _MyAppState extends State<MyApp> {
           color: Theme.of(context).colorScheme.primaryContainer,
         ), */
         scaffoldBackgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          iconSize: 40,
+        ),
       ),
       builder: (context, child) {
         child = virtualWindowFrameBuilder(context, child);

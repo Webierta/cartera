@@ -39,6 +39,7 @@ class _EntidadFondosState extends ConsumerState<EntidadFondos> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      //key: UniqueKey(),
       shrinkWrap: true,
       itemCount: fondosEntidad.length,
       itemBuilder: (context, index) {
@@ -52,6 +53,7 @@ class _EntidadFondosState extends ConsumerState<EntidadFondos> {
           valores.sort((a, b) => a.fecha.compareTo(b.fecha));
           }*/
         return ListTile(
+          //key: UniqueKey(),
           onTap: () {
             Navigator.push(
               context,
