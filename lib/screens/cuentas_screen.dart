@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import '../services/tablas.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
@@ -72,7 +73,8 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
         //title: Text('Cuentas ($numeroCuentas)'),
         title: Row(
           children: [
-            const Text('Cuentas'),
+            //const Text('Cuentas'),
+            Text(TipoProducto.cuenta.nombrePlural),
             const SizedBox(width: 20),
             CircleAvatar(child: Text('$numeroCuentas')),
           ],
@@ -187,6 +189,12 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> getSaldoTotal() async {
     List<double> lastSaldos = [];
     for (var cuenta in widget.cuentas) {
@@ -229,9 +237,7 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
           }
         }
       }
-      setState(() {
-        entidadSaldo[entidad] = saldo;
-      });
+      setState(() => entidadSaldo[entidad] = saldo);
     }
   }
 
@@ -301,8 +307,8 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
           children: [
             Expanded(
               child: ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.account_balance_wallet, size: 40),
+                leading: CircleAvatar(
+                  child: Icon(TipoProducto.cuenta.icon, size: 40),
                 ),
                 title: Text(
                   NumberUtil.currency(saldoTotal),
@@ -356,8 +362,9 @@ class _ListadoCuentasState extends ConsumerState<ListadoCuentas> {
                                     ? Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => EntidadScreen(
-                                                entidad: entidadData)))
+                                          builder: (context) => EntidadScreen(
+                                              entidad: entidadData),
+                                        ))
                                     : null;
                               },
                               child: CircleAvatar(

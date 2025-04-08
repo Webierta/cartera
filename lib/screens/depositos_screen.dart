@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import '../services/tablas.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
@@ -70,7 +71,8 @@ class _DepositosScreenState extends ConsumerState<DepositosScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            const Text('Depósitos'),
+            //const Text('Depósitos'),
+            Text(TipoProducto.deposito.nombrePlural),
             const SizedBox(width: 20),
             CircleAvatar(child: Text('$numeroDepositos')),
           ],
@@ -182,6 +184,12 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   getImposicionTotal() {
     double imposicion = 0;
     for (var deposito in widget.depositos) {
@@ -218,9 +226,7 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
           imposicion += deposito.imposicion;
         }
       }
-      setState(() {
-        entidadImposicion[entidad] = imposicion;
-      });
+      setState(() => entidadImposicion[entidad] = imposicion);
     }
   }
 
@@ -260,8 +266,8 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
           children: [
             Expanded(
               child: ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.savings),
+                leading: CircleAvatar(
+                  child: Icon(TipoProducto.deposito.icon, size: 40),
                 ),
                 title: Text(
                   NumberUtil.currency(imposicionTotal),

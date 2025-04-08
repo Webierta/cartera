@@ -1,6 +1,16 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart' as material;
 
-enum TipoProducto { cuenta, deposito, fondo }
+enum TipoProducto {
+  cuenta(nombrePlural: 'Cuentas', icon: material.Icons.account_balance_wallet),
+  deposito(nombrePlural: 'Depósitos', icon: material.Icons.savings),
+  fondo(nombrePlural: 'Fondos', icon: material.Icons.assessment);
+
+  final String nombrePlural;
+  final material.IconData icon;
+
+  const TipoProducto({required this.nombrePlural, required this.icon});
+}
 
 enum Titular { jcv, rpp, ambos }
 

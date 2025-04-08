@@ -33,6 +33,12 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadEntidades() async {
     var entidadesList = await database.allEntidades;
     if (entidadesList.isEmpty) {

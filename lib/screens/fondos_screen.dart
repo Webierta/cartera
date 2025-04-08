@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import '../services/tablas.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/background_image.dart';
@@ -69,7 +70,8 @@ class _FondosScreenState extends ConsumerState<FondosScreen> {
         //title: const Text('Fondos'),
         title: Row(
           children: [
-            const Text('Fondos'),
+            //const Text('Fondos'),
+            Text(TipoProducto.fondo.nombrePlural),
             const SizedBox(width: 20),
             CircleAvatar(child: Text('$numeroFondos')),
           ],
@@ -183,6 +185,12 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> getEntidadesSet() async {
     Set<String> entidadesNombres = {};
     for (var fondo in widget.fondos) {
@@ -216,9 +224,7 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
           }
         }
       }
-      setState(() {
-        entidadCapital[entidad] = capital;
-      });
+      setState(() => entidadCapital[entidad] = capital);
     }
   }
 
@@ -277,8 +283,8 @@ class _ListadoFondosState extends ConsumerState<ListadoFondos> {
           children: [
             Expanded(
               child: ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.assessment),
+                leading: CircleAvatar(
+                  child: Icon(TipoProducto.fondo.icon, size: 40),
                 ),
                 isThreeLine: true,
                 title: Text(

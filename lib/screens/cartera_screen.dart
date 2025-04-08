@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carteradb/screens/depositos_screen.dart';
 import 'package:drift/drift.dart' as dr;
 import 'package:flutter/material.dart';
 import 'package:flutter_iterum/flutter_iterum.dart';
@@ -17,7 +18,6 @@ import '../widgets/confirm_dialog.dart';
 import '../widgets/grafico_pastel.dart';
 import '../widgets/menu.dart';
 import 'cuentas_screen.dart';
-import 'depositos_screen.dart';
 import 'entidades_screen.dart';
 import 'fondos_screen.dart';
 import 'grafico_screen.dart';
@@ -294,7 +294,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             Badge.count(
               count: alertaDepositos,
               isLabelVisible: true,
-              child: const Icon(Icons.savings),
+              child: Icon(TipoProducto.deposito.icon),
             ),
           const SizedBox(width: 6),
           IconButton(
@@ -395,155 +395,34 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                       MouseRegion(
                         onHover: (e) => setState(() => touchedIndex = 0),
                         onExit: (e) => setState(() => touchedIndex = -1),
-                        child: ListTile(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CuentasScreen(),
-                              ),
-                            );
-                          },
-                          //dense: true,
-                          visualDensity: const VisualDensity(vertical: 4),
-                          leading: Icon(
-                            Icons.account_balance_wallet,
-                            size: 40,
-                            color: touchedIndex == 0
-                                ? Colors.blue
-                                : const IconThemeData().color,
-                          ),
-                          title: Text(
-                            'Cuentas',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: touchedIndex == 0
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                          subtitle: Text('${cuentas.length}'),
-                          trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(totalCuentas),
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                color: Theme.of(context).colorScheme.primary,
-                                child: Text(
-                                  NumberUtil.porcentage(
-                                      (totalCuentas * 100) / total),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: ProductoCartera(
+                          isHover: touchedIndex == 0,
+                          producto: TipoProducto.cuenta,
+                          total: total,
+                          totalProducto: totalCuentas,
+                          lengthProducto: cuentas.length,
                         ),
                       ),
                       MouseRegion(
                         onHover: (e) => setState(() => touchedIndex = 1),
                         onExit: (e) => setState(() => touchedIndex = -1),
-                        child: ListTile(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DepositosScreen(),
-                              ),
-                            );
-                          },
-                          visualDensity: const VisualDensity(vertical: 4),
-                          leading: Icon(
-                            Icons.savings,
-                            size: 40,
-                            color: touchedIndex == 1
-                                ? Colors.green
-                                : const IconThemeData().color,
-                          ),
-                          title: Text(
-                            'Depósitos',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: touchedIndex == 1
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                          subtitle: Text('${depositos.length}'),
-                          trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(totalDepositos),
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                color: Theme.of(context).colorScheme.primary,
-                                child: Text(
-                                  NumberUtil.porcentage(
-                                      (totalDepositos * 100) / total),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: ProductoCartera(
+                          isHover: touchedIndex == 1,
+                          producto: TipoProducto.deposito,
+                          total: total,
+                          totalProducto: totalDepositos,
+                          lengthProducto: depositos.length,
                         ),
                       ),
                       MouseRegion(
                         onHover: (e) => setState(() => touchedIndex = 2),
                         onExit: (e) => setState(() => touchedIndex = -1),
-                        child: ListTile(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const FondosScreen(),
-                              ),
-                            );
-                          },
-                          visualDensity: const VisualDensity(vertical: 4),
-                          leading: Icon(
-                            Icons.assessment,
-                            size: 40,
-                            color: touchedIndex == 2
-                                ? Colors.red
-                                : const IconThemeData().color,
-                          ),
-                          title: Text(
-                            'Fondos',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: touchedIndex == 2
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                          subtitle: Text('${fondos.length}'),
-                          trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(totalFondos),
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                color: Theme.of(context).colorScheme.primary,
-                                child: Text(
-                                  NumberUtil.porcentage(
-                                      (totalFondos * 100) / total),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: ProductoCartera(
+                          isHover: touchedIndex == 2,
+                          producto: TipoProducto.fondo,
+                          total: total,
+                          totalProducto: totalFondos,
+                          lengthProducto: fondos.length,
                         ),
                       ),
                     ],
@@ -647,9 +526,9 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               child: TextField(
                 controller: cuentasController,
                 //canRequestFocus: false,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.account_balance_wallet),
-                  labelText: 'Cuentas',
+                decoration: InputDecoration(
+                  prefixIcon: Icon(TipoProducto.cuenta.icon),
+                  labelText: TipoProducto.cuenta.nombrePlural,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -659,9 +538,9 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               child: TextField(
                 controller: depositosController,
                 //canRequestFocus: false,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.savings),
-                  labelText: 'Depósitos',
+                decoration: InputDecoration(
+                  prefixIcon: Icon(TipoProducto.deposito.icon),
+                  labelText: TipoProducto.deposito.nombrePlural,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -671,9 +550,9 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               child: TextField(
                 controller: fondosController,
                 //canRequestFocus: false,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.assessment),
-                  labelText: 'Fondos',
+                decoration: InputDecoration(
+                  prefixIcon: Icon(TipoProducto.fondo.icon),
+                  labelText: TipoProducto.fondo.nombrePlural,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -684,7 +563,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                 controller: totalController,
                 //canRequestFocus: false,
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.assessment),
+                  prefixIcon: Icon(Icons.business_center),
                   labelText: 'Total',
                   border: OutlineInputBorder(),
                 ),
@@ -898,6 +777,107 @@ class HistoricoCartera extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class ProductoCartera extends StatefulWidget {
+  final bool isHover;
+  final TipoProducto producto;
+  final double total;
+  final double totalProducto;
+  final int lengthProducto;
+  const ProductoCartera({
+    super.key,
+    required this.isHover,
+    required this.producto,
+    required this.total,
+    required this.totalProducto,
+    required this.lengthProducto,
+  });
+
+  @override
+  State<ProductoCartera> createState() => _ProductoCarteraState();
+}
+
+class _ProductoCarteraState extends State<ProductoCartera> {
+  late Widget destino;
+
+  @override
+  void initState() {
+    destino = switch (widget.producto) {
+      TipoProducto.cuenta => const CuentasScreen(),
+      TipoProducto.deposito => const DepositosScreen(),
+      TipoProducto.fondo => const FondosScreen(),
+    };
+    super.initState();
+  }
+
+  Icon getIcono() {
+    Color? color = IconThemeData().color;
+    color = switch (widget.producto) {
+      TipoProducto.cuenta =>
+        widget.isHover ? Colors.blue : IconThemeData().color,
+      TipoProducto.deposito =>
+        widget.isHover ? Colors.green : IconThemeData().color,
+      TipoProducto.fondo => widget.isHover ? Colors.red : IconThemeData().color,
+    };
+    return Icon(widget.producto.icon, size: 40, color: color);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => destino),
+        );
+      },
+      //dense: true,
+      visualDensity: const VisualDensity(vertical: 4),
+      leading: getIcono(),
+      title: Row(
+        children: [
+          Text(
+            widget.producto.nombrePlural,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: widget.isHover ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          const SizedBox(width: 8),
+          CircleAvatar(
+            backgroundColor:
+                Theme.of(context).colorScheme.primary.withAlpha(100),
+            child: Text(
+              '${widget.lengthProducto}',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      trailing: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            NumberUtil.currency(widget.totalProducto),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: widget.isHover ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            color: Theme.of(context).colorScheme.primary,
+            child: Text(
+              NumberUtil.porcentage(
+                  (widget.totalProducto * 100) / widget.total),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
