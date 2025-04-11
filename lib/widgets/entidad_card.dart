@@ -46,12 +46,16 @@ class _EntidadCardState extends ConsumerState<EntidadCard> {
 
   sumarTotalesEntidades() async {
     final getHistorico = await database.allHistorico;
-    final historico = getHistorico.first;
-    final total = historico.totalCuentas +
-        historico.totalDepositos +
-        historico.totalFondos;
-    if (mounted) {
-      setState(() => totalEntidades = total);
+    if (getHistorico.isEmpty) {
+      if (mounted) setState(() => totalEntidades = 0);
+    } else {
+      final historico = getHistorico.first;
+      final total = historico.totalCuentas +
+          historico.totalDepositos +
+          historico.totalFondos;
+      if (mounted) {
+        setState(() => totalEntidades = total);
+      }
     }
   }
 

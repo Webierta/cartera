@@ -1,5 +1,8 @@
 /*
+https://drift.simonbinder.eu/
 https://medium.com/@tagizada.nicat/migration-with-flutter-drift-c9e21e905eeb
+https://r1n1os.medium.com/drift-local-database-for-flutter-part-1-intro-setup-and-migration-09a64d44f6df
+
 dart run build_runner build
 
 UPDATE DATABASE VERSION
@@ -32,13 +35,14 @@ part 'app_database.g.dart';
   Fondo,
   ValoresFondo,
   Entidad,
-  Historico
+  Historico,
+  Alarma
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -46,7 +50,54 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
       },
+      onUpgrade: (Migrator m, int from, int to) async {
+        //from1To2: (Migrator m, Schema2 schema) async {},
+        if (from < 2) {
+          await m.create(alarma);
+        }
+      },
     );
+  }
+
+  // ALARMA
+  Future<List<AlarmaData>> get allAlarmas => select(alarma).get();
+
+  Future<List<AlarmaData>> get alarmasFecha {
+    return (select(alarma)
+          ..orderBy([
+            (s) => OrderingTerm(expression: s.fecha, mode: OrderingMode.asc)
+          ]))
+        .get();
+  }
+
+  Future<int> addAlarma(AlarmaCompanion newAlarma) {
+    return into(alarma).insert(newAlarma);
+  }
+
+  Future<int> updateAlarma(int id, AlarmaCompanion companion) {
+    return (update(alarma)..where((tbl) => tbl.id.equals(id))).write(companion);
+  }
+
+  Future<int> deleteAlarma(int id) {
+    return (delete(alarma)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  /* Stream<List<AlarmaData>> getAlarmasEntidad(String entidadName) {
+    return (select(alarma)
+          ..where((s) => s.entidad.equals(entidadName))
+          ..orderBy([
+            (s) => OrderingTerm(expression: s.fecha, mode: OrderingMode.desc)
+          ]))
+        .watch();
+  } */
+
+  Future<List<AlarmaData>> alarmasEntidad(String entidadName) {
+    return (select(alarma)
+          ..where((s) => s.entidad.equals(entidadName))
+          ..orderBy([
+            (s) => OrderingTerm(expression: s.fecha, mode: OrderingMode.desc)
+          ]))
+        .get();
   }
 
   // ENTIDADES

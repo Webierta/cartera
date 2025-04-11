@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
 import '../widgets/entidad_card.dart';
 import '../widgets/entidad_cuentas.dart';
 import '../widgets/entidad_depositos.dart';
 import '../widgets/entidad_fondos.dart';
+import 'alarma_add_screen.dart';
 import 'cartera_screen.dart';
 import 'entidad_add_screen.dart';
 
 class EntidadScreen extends ConsumerStatefulWidget {
   final EntidadData entidad;
   const EntidadScreen({super.key, required this.entidad});
-
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _EntidadScreenState();
 }
@@ -25,6 +26,8 @@ class _EntidadScreenState extends ConsumerState<EntidadScreen> {
   Map<String, double> entidadSaldo = {};
   Map<String, double> entidadImposicion = {};
   Map<String, double> entidadCapital = {};
+  List<AlarmaData> alarmas = [];
+  List<AlarmaData> alarmasEntidad = [];
 
   @override
   void initState() {
@@ -32,8 +35,22 @@ class _EntidadScreenState extends ConsumerState<EntidadScreen> {
     getEntidadSaldo();
     getEntidadImposicion();
     getEntidadCapital();
+    getAlarmas();
     super.initState();
   }
+
+  Future<void> getAlarmas() async {
+    //final allAlarmas = await database.allAlarmas;
+    final alarmasFecha = await database.alarmasFecha;
+    setState(() {
+      alarmas =
+          alarmasFecha.where((c) => c.entidad == widget.entidad.name).toList();
+    });
+  }
+
+  /* Future<List<AlarmaData>> getAlarmasEntidad(String entidad) async {
+    return await database.alarmasEntidad(entidad);
+  } */
 
   Future<void> getEntidadSaldo() async {
     final cuentas = await database.allCuentas;
@@ -220,6 +237,69 @@ class _EntidadScreenState extends ConsumerState<EntidadScreen> {
                       ],
                     ),
                     EntidadFondos(entidad: widget.entidad),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.alarm,
+                          size: 48,
+                        ),
+                        const Text(
+                          'ALARMAS',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AlarmaAddScreen(entidad: widget.entidad),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.alarm_add),
+                        ),
+                      ],
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: alarmas.length,
+                      itemBuilder: (context, index) {
+                        final alarma = alarmas[index];
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AlarmaAddScreen(
+                                  entidad: widget.entidad,
+                                  editAlarma: alarma,
+                                ),
+                              ),
+                            );
+                          },
+                          isThreeLine: true,
+                          title: Text(
+                            FechaUtil.dateToString(
+                              date: alarma.fecha,
+                              formato: 'd/MM/yy',
+                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(alarma.aviso),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

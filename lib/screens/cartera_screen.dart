@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:carteradb/screens/depositos_screen.dart';
 import 'package:drift/drift.dart' as dr;
 import 'package:flutter/material.dart';
 import 'package:flutter_iterum/flutter_iterum.dart';
@@ -18,6 +17,7 @@ import '../widgets/confirm_dialog.dart';
 import '../widgets/grafico_pastel.dart';
 import '../widgets/menu.dart';
 import 'cuentas_screen.dart';
+import 'depositos_screen.dart';
 import 'entidades_screen.dart';
 import 'fondos_screen.dart';
 import 'grafico_screen.dart';
@@ -51,13 +51,33 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   TextEditingController totalController = TextEditingController();
   List<HistoricoData> historico = [];
   int alertaDepositos = 0;
+  int alarmasProximas = 0;
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
     initLocalStorage();
     loadProducts();
+    getAlarmas();
     super.initState();
+  }
+
+  Future<void> getAlarmas() async {
+    final allAlarmas = await database.allAlarmas;
+    if (allAlarmas.isEmpty) {
+      setState(() => alarmasProximas = 0);
+      return;
+    }
+    int alarmas = 0;
+    for (var alarma in allAlarmas) {
+      if (alarma.fecha.difference(DateTime.now()).inDays < 31) {
+        alarmas++;
+      }
+    }
+    setState(() => alarmasProximas = alarmas);
+    /* final alarmasMes = alarmasFecha.where(
+      (a) => DateTime.now().difference(a.fecha) < Duration(days: 31),
+    ); */
   }
 
   initLocalStorage() async {
@@ -98,9 +118,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
   Future<void> loadCuentas() async {
     final allCuentas = await database.allCuentas;
     if (!mounted) return;
-    setState(() {
-      cuentas = allCuentas;
-    });
+    setState(() => cuentas = allCuentas);
     await getSaldoTotal();
   }
 
@@ -290,13 +308,6 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
         //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Balance Económico'),
         actions: [
-          if (alertaDepositos > 0)
-            Badge.count(
-              count: alertaDepositos,
-              isLabelVisible: true,
-              child: Icon(TipoProducto.deposito.icon),
-            ),
-          const SizedBox(width: 6),
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -306,7 +317,16 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                 ),
               );
             },
-            icon: const Icon(Icons.account_balance),
+            icon: Badge.count(
+              count: alarmasProximas,
+              isLabelVisible: alarmasProximas > 0,
+              child: alarmasProximas > 0
+                  ? Tooltip(
+                      message: 'Próximos eventos',
+                      child: Icon(Icons.account_balance),
+                    )
+                  : Icon(Icons.account_balance),
+            ),
           ),
           IconButton(
             onPressed: () {
@@ -412,6 +432,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                           total: total,
                           totalProducto: totalDepositos,
                           lengthProducto: depositos.length,
+                          alertaDepositos: alertaDepositos,
                         ),
                       ),
                       MouseRegion(
@@ -447,11 +468,9 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               child: const Row(
                 children: [
                   Expanded(
-                      flex: 1,
-                      child: Text(
-                        '#',
-                        textAlign: TextAlign.center,
-                      )),
+                    flex: 1,
+                    child: Text('#', textAlign: TextAlign.center),
+                  ),
                   Expanded(
                     flex: 3,
                     child: Text('Fecha', textAlign: TextAlign.center),
@@ -787,6 +806,7 @@ class ProductoCartera extends StatefulWidget {
   final double total;
   final double totalProducto;
   final int lengthProducto;
+  final int alertaDepositos;
   const ProductoCartera({
     super.key,
     required this.isHover,
@@ -794,6 +814,7 @@ class ProductoCartera extends StatefulWidget {
     required this.total,
     required this.totalProducto,
     required this.lengthProducto,
+    this.alertaDepositos = 0,
   });
 
   @override
@@ -813,7 +834,7 @@ class _ProductoCarteraState extends State<ProductoCartera> {
     super.initState();
   }
 
-  Icon getIcono() {
+  Widget getIcono() {
     Color? color = IconThemeData().color;
     color = switch (widget.producto) {
       TipoProducto.cuenta =>
@@ -822,6 +843,17 @@ class _ProductoCarteraState extends State<ProductoCartera> {
         widget.isHover ? Colors.green : IconThemeData().color,
       TipoProducto.fondo => widget.isHover ? Colors.red : IconThemeData().color,
     };
+    if (widget.producto == TipoProducto.deposito &&
+        widget.alertaDepositos > 0) {
+      return Badge.count(
+        count: widget.alertaDepositos,
+        isLabelVisible: true,
+        child: Tooltip(
+          message: 'Depósitos con próximo vencimiento',
+          child: Icon(widget.producto.icon, size: 40, color: color),
+        ),
+      );
+    }
     return Icon(widget.producto.icon, size: 40, color: color);
   }
 

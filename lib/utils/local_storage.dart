@@ -8,6 +8,7 @@ class LocalStorage {
   static const String _dbPath = 'keyDbPath';
   static const String _loginRequerido = 'loginRequerido';
   static const String _userActivo = 'userActivo';
+  //static const String _notas = 'notas';
 
   init() async {
     pathToFile = await DbTransfer.getDbPath();
@@ -27,4 +28,7 @@ class LocalStorage {
 
   String get userActivo => _sharedPrefs?.getString(_userActivo) ?? '';
   set userActivo(String value) => _sharedPrefs?.setString(_userActivo, value);
+
+  //List<String> get notas => _sharedPrefs?.getStringList(_notas) ?? [];
+  //set notas(List<String> value) => _sharedPrefs?.setStringList(_notas, value);
 }

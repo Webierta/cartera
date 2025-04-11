@@ -2567,6 +2567,264 @@ class HistoricoCompanion extends UpdateCompanion<HistoricoData> {
   }
 }
 
+class $AlarmaTable extends Alarma with TableInfo<$AlarmaTable, AlarmaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AlarmaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _fechaMeta = const VerificationMeta('fecha');
+  @override
+  late final GeneratedColumn<DateTime> fecha = GeneratedColumn<DateTime>(
+      'fecha', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _avisoMeta = const VerificationMeta('aviso');
+  @override
+  late final GeneratedColumn<String> aviso = GeneratedColumn<String>(
+      'aviso', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _entidadMeta =
+      const VerificationMeta('entidad');
+  @override
+  late final GeneratedColumn<String> entidad = GeneratedColumn<String>(
+      'entidad', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES entidad (name)'));
+  @override
+  List<GeneratedColumn> get $columns => [id, fecha, aviso, entidad];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'alarma';
+  @override
+  VerificationContext validateIntegrity(Insertable<AlarmaData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('fecha')) {
+      context.handle(
+          _fechaMeta, fecha.isAcceptableOrUnknown(data['fecha']!, _fechaMeta));
+    } else if (isInserting) {
+      context.missing(_fechaMeta);
+    }
+    if (data.containsKey('aviso')) {
+      context.handle(
+          _avisoMeta, aviso.isAcceptableOrUnknown(data['aviso']!, _avisoMeta));
+    } else if (isInserting) {
+      context.missing(_avisoMeta);
+    }
+    if (data.containsKey('entidad')) {
+      context.handle(_entidadMeta,
+          entidad.isAcceptableOrUnknown(data['entidad']!, _entidadMeta));
+    } else if (isInserting) {
+      context.missing(_entidadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AlarmaData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AlarmaData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      fecha: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}fecha'])!,
+      aviso: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}aviso'])!,
+      entidad: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entidad'])!,
+    );
+  }
+
+  @override
+  $AlarmaTable createAlias(String alias) {
+    return $AlarmaTable(attachedDatabase, alias);
+  }
+}
+
+class AlarmaData extends DataClass implements Insertable<AlarmaData> {
+  final int id;
+  final DateTime fecha;
+  final String aviso;
+  final String entidad;
+  const AlarmaData(
+      {required this.id,
+      required this.fecha,
+      required this.aviso,
+      required this.entidad});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['fecha'] = Variable<DateTime>(fecha);
+    map['aviso'] = Variable<String>(aviso);
+    map['entidad'] = Variable<String>(entidad);
+    return map;
+  }
+
+  AlarmaCompanion toCompanion(bool nullToAbsent) {
+    return AlarmaCompanion(
+      id: Value(id),
+      fecha: Value(fecha),
+      aviso: Value(aviso),
+      entidad: Value(entidad),
+    );
+  }
+
+  factory AlarmaData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AlarmaData(
+      id: serializer.fromJson<int>(json['id']),
+      fecha: serializer.fromJson<DateTime>(json['fecha']),
+      aviso: serializer.fromJson<String>(json['aviso']),
+      entidad: serializer.fromJson<String>(json['entidad']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'fecha': serializer.toJson<DateTime>(fecha),
+      'aviso': serializer.toJson<String>(aviso),
+      'entidad': serializer.toJson<String>(entidad),
+    };
+  }
+
+  AlarmaData copyWith(
+          {int? id, DateTime? fecha, String? aviso, String? entidad}) =>
+      AlarmaData(
+        id: id ?? this.id,
+        fecha: fecha ?? this.fecha,
+        aviso: aviso ?? this.aviso,
+        entidad: entidad ?? this.entidad,
+      );
+  AlarmaData copyWithCompanion(AlarmaCompanion data) {
+    return AlarmaData(
+      id: data.id.present ? data.id.value : this.id,
+      fecha: data.fecha.present ? data.fecha.value : this.fecha,
+      aviso: data.aviso.present ? data.aviso.value : this.aviso,
+      entidad: data.entidad.present ? data.entidad.value : this.entidad,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AlarmaData(')
+          ..write('id: $id, ')
+          ..write('fecha: $fecha, ')
+          ..write('aviso: $aviso, ')
+          ..write('entidad: $entidad')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, fecha, aviso, entidad);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AlarmaData &&
+          other.id == this.id &&
+          other.fecha == this.fecha &&
+          other.aviso == this.aviso &&
+          other.entidad == this.entidad);
+}
+
+class AlarmaCompanion extends UpdateCompanion<AlarmaData> {
+  final Value<int> id;
+  final Value<DateTime> fecha;
+  final Value<String> aviso;
+  final Value<String> entidad;
+  const AlarmaCompanion({
+    this.id = const Value.absent(),
+    this.fecha = const Value.absent(),
+    this.aviso = const Value.absent(),
+    this.entidad = const Value.absent(),
+  });
+  AlarmaCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime fecha,
+    required String aviso,
+    required String entidad,
+  })  : fecha = Value(fecha),
+        aviso = Value(aviso),
+        entidad = Value(entidad);
+  static Insertable<AlarmaData> custom({
+    Expression<int>? id,
+    Expression<DateTime>? fecha,
+    Expression<String>? aviso,
+    Expression<String>? entidad,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (fecha != null) 'fecha': fecha,
+      if (aviso != null) 'aviso': aviso,
+      if (entidad != null) 'entidad': entidad,
+    });
+  }
+
+  AlarmaCompanion copyWith(
+      {Value<int>? id,
+      Value<DateTime>? fecha,
+      Value<String>? aviso,
+      Value<String>? entidad}) {
+    return AlarmaCompanion(
+      id: id ?? this.id,
+      fecha: fecha ?? this.fecha,
+      aviso: aviso ?? this.aviso,
+      entidad: entidad ?? this.entidad,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (fecha.present) {
+      map['fecha'] = Variable<DateTime>(fecha.value);
+    }
+    if (aviso.present) {
+      map['aviso'] = Variable<String>(aviso.value);
+    }
+    if (entidad.present) {
+      map['entidad'] = Variable<String>(entidad.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AlarmaCompanion(')
+          ..write('id: $id, ')
+          ..write('fecha: $fecha, ')
+          ..write('aviso: $aviso, ')
+          ..write('entidad: $entidad')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2577,12 +2835,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FondoTable fondo = $FondoTable(this);
   late final $ValoresFondoTable valoresFondo = $ValoresFondoTable(this);
   late final $HistoricoTable historico = $HistoricoTable(this);
+  late final $AlarmaTable alarma = $AlarmaTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [entidad, cuenta, saldosCuenta, deposito, fondo, valoresFondo, historico];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        entidad,
+        cuenta,
+        saldosCuenta,
+        deposito,
+        fondo,
+        valoresFondo,
+        historico,
+        alarma
+      ];
 }
 
 typedef $$EntidadTableCreateCompanionBuilder = EntidadCompanion Function({
@@ -2647,6 +2914,20 @@ final class $$EntidadTableReferences
         .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
 
     final cache = $_typedResult.readTableOrNull(_fondoRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$AlarmaTable, List<AlarmaData>> _alarmaRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.alarma,
+          aliasName: $_aliasNameGenerator(db.entidad.name, db.alarma.entidad));
+
+  $$AlarmaTableProcessedTableManager get alarmaRefs {
+    final manager = $$AlarmaTableTableManager($_db, $_db.alarma)
+        .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
+
+    final cache = $_typedResult.readTableOrNull(_alarmaRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -2737,6 +3018,27 @@ class $$EntidadTableFilterComposer
             $$FondoTableFilterComposer(
               $db: $db,
               $table: $db.fondo,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> alarmaRefs(
+      Expression<bool> Function($$AlarmaTableFilterComposer f) f) {
+    final $$AlarmaTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.alarma,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmaTableFilterComposer(
+              $db: $db,
+              $table: $db.alarma,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2869,6 +3171,27 @@ class $$EntidadTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> alarmaRefs<T extends Object>(
+      Expression<T> Function($$AlarmaTableAnnotationComposer a) f) {
+    final $$AlarmaTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.alarma,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmaTableAnnotationComposer(
+              $db: $db,
+              $table: $db.alarma,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$EntidadTableTableManager extends RootTableManager<
@@ -2883,7 +3206,10 @@ class $$EntidadTableTableManager extends RootTableManager<
     (EntidadData, $$EntidadTableReferences),
     EntidadData,
     PrefetchHooks Function(
-        {bool cuentaRefs, bool depositoRefs, bool fondoRefs})> {
+        {bool cuentaRefs,
+        bool depositoRefs,
+        bool fondoRefs,
+        bool alarmaRefs})> {
   $$EntidadTableTableManager(_$AppDatabase db, $EntidadTable table)
       : super(TableManagerState(
           db: db,
@@ -2935,13 +3261,17 @@ class $$EntidadTableTableManager extends RootTableManager<
                   (e.readTable(table), $$EntidadTableReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: (
-              {cuentaRefs = false, depositoRefs = false, fondoRefs = false}) {
+              {cuentaRefs = false,
+              depositoRefs = false,
+              fondoRefs = false,
+              alarmaRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (cuentaRefs) db.cuenta,
                 if (depositoRefs) db.deposito,
-                if (fondoRefs) db.fondo
+                if (fondoRefs) db.fondo,
+                if (alarmaRefs) db.alarma
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
@@ -2982,6 +3312,18 @@ class $$EntidadTableTableManager extends RootTableManager<
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.entidad == item.name),
+                        typedResults: items),
+                  if (alarmaRefs)
+                    await $_getPrefetchedData<EntidadData, $EntidadTable,
+                            AlarmaData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$EntidadTableReferences._alarmaRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$EntidadTableReferences(db, table, p0).alarmaRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.entidad == item.name),
                         typedResults: items)
                 ];
               },
@@ -3002,7 +3344,7 @@ typedef $$EntidadTableProcessedTableManager = ProcessedTableManager<
     (EntidadData, $$EntidadTableReferences),
     EntidadData,
     PrefetchHooks Function(
-        {bool cuentaRefs, bool depositoRefs, bool fondoRefs})>;
+        {bool cuentaRefs, bool depositoRefs, bool fondoRefs, bool alarmaRefs})>;
 typedef $$CuentaTableCreateCompanionBuilder = CuentaCompanion Function({
   Value<int> id,
   required String name,
@@ -4786,6 +5128,254 @@ typedef $$HistoricoTableProcessedTableManager = ProcessedTableManager<
     ),
     HistoricoData,
     PrefetchHooks Function()>;
+typedef $$AlarmaTableCreateCompanionBuilder = AlarmaCompanion Function({
+  Value<int> id,
+  required DateTime fecha,
+  required String aviso,
+  required String entidad,
+});
+typedef $$AlarmaTableUpdateCompanionBuilder = AlarmaCompanion Function({
+  Value<int> id,
+  Value<DateTime> fecha,
+  Value<String> aviso,
+  Value<String> entidad,
+});
+
+final class $$AlarmaTableReferences
+    extends BaseReferences<_$AppDatabase, $AlarmaTable, AlarmaData> {
+  $$AlarmaTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EntidadTable _entidadTable(_$AppDatabase db) => db.entidad
+      .createAlias($_aliasNameGenerator(db.alarma.entidad, db.entidad.name));
+
+  $$EntidadTableProcessedTableManager get entidad {
+    final $_column = $_itemColumn<String>('entidad')!;
+
+    final manager = $$EntidadTableTableManager($_db, $_db.entidad)
+        .filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entidadTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$AlarmaTableFilterComposer
+    extends Composer<_$AppDatabase, $AlarmaTable> {
+  $$AlarmaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get aviso => $composableBuilder(
+      column: $table.aviso, builder: (column) => ColumnFilters(column));
+
+  $$EntidadTableFilterComposer get entidad {
+    final $$EntidadTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableFilterComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AlarmaTableOrderingComposer
+    extends Composer<_$AppDatabase, $AlarmaTable> {
+  $$AlarmaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get fecha => $composableBuilder(
+      column: $table.fecha, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get aviso => $composableBuilder(
+      column: $table.aviso, builder: (column) => ColumnOrderings(column));
+
+  $$EntidadTableOrderingComposer get entidad {
+    final $$EntidadTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableOrderingComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AlarmaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AlarmaTable> {
+  $$AlarmaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fecha =>
+      $composableBuilder(column: $table.fecha, builder: (column) => column);
+
+  GeneratedColumn<String> get aviso =>
+      $composableBuilder(column: $table.aviso, builder: (column) => column);
+
+  $$EntidadTableAnnotationComposer get entidad {
+    final $$EntidadTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableAnnotationComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AlarmaTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $AlarmaTable,
+    AlarmaData,
+    $$AlarmaTableFilterComposer,
+    $$AlarmaTableOrderingComposer,
+    $$AlarmaTableAnnotationComposer,
+    $$AlarmaTableCreateCompanionBuilder,
+    $$AlarmaTableUpdateCompanionBuilder,
+    (AlarmaData, $$AlarmaTableReferences),
+    AlarmaData,
+    PrefetchHooks Function({bool entidad})> {
+  $$AlarmaTableTableManager(_$AppDatabase db, $AlarmaTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AlarmaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AlarmaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AlarmaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<DateTime> fecha = const Value.absent(),
+            Value<String> aviso = const Value.absent(),
+            Value<String> entidad = const Value.absent(),
+          }) =>
+              AlarmaCompanion(
+            id: id,
+            fecha: fecha,
+            aviso: aviso,
+            entidad: entidad,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required DateTime fecha,
+            required String aviso,
+            required String entidad,
+          }) =>
+              AlarmaCompanion.insert(
+            id: id,
+            fecha: fecha,
+            aviso: aviso,
+            entidad: entidad,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$AlarmaTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({entidad = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (entidad) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.entidad,
+                    referencedTable: $$AlarmaTableReferences._entidadTable(db),
+                    referencedColumn:
+                        $$AlarmaTableReferences._entidadTable(db).name,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$AlarmaTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $AlarmaTable,
+    AlarmaData,
+    $$AlarmaTableFilterComposer,
+    $$AlarmaTableOrderingComposer,
+    $$AlarmaTableAnnotationComposer,
+    $$AlarmaTableCreateCompanionBuilder,
+    $$AlarmaTableUpdateCompanionBuilder,
+    (AlarmaData, $$AlarmaTableReferences),
+    AlarmaData,
+    PrefetchHooks Function({bool entidad})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4804,4 +5394,6 @@ class $AppDatabaseManager {
       $$ValoresFondoTableTableManager(_db, _db.valoresFondo);
   $$HistoricoTableTableManager get historico =>
       $$HistoricoTableTableManager(_db, _db.historico);
+  $$AlarmaTableTableManager get alarma =>
+      $$AlarmaTableTableManager(_db, _db.alarma);
 }

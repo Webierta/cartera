@@ -16,6 +16,13 @@ enum Titular { jcv, rpp, ambos }
 
 enum TipoOp { suscripcion, reembolso }
 
+class Alarma extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get fecha => dateTime()();
+  TextColumn get aviso => text()();
+  TextColumn get entidad => text().references(Entidad, #name)();
+}
+
 class Entidad extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();

@@ -3,10 +3,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/app_database.dart';
+import '../utils/fecha_util.dart';
 import '../utils/number_util.dart';
 import '../utils/stats.dart';
+import '../widgets/background_image.dart';
 import '../widgets/entidad_card.dart';
 import '../widgets/sort_buttons.dart';
+import 'alarma_add_screen.dart';
 import 'cartera_screen.dart';
 import 'entidad_add_screen.dart';
 
@@ -25,11 +28,13 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
   Map<EntidadData, double> mapEntidadDepositos = {};
   Map<EntidadData, double> mapEntidadFondos = {};
   double sumaTotal = 0;
+  List<AlarmaData> alarmas = [];
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
     loadEntidades();
+    getAlarmas();
     super.initState();
   }
 
@@ -37,6 +42,15 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> getAlarmas() async {
+    //final allAlarmas = await database.allAlarmas;
+    final alarmasFecha = await database.alarmasFecha;
+    setState(() {
+      //alarmas = allAlarmas.where((c) => c.entidad == widget.entidad.name).toList();
+      alarmas = alarmasFecha;
+    });
   }
 
   Future<void> loadEntidades() async {
@@ -199,6 +213,86 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
             CircleAvatar(child: Text('${entidades.length}')),
           ],
         ),
+        actions: [
+          if (alarmas.isNotEmpty)
+            Badge.count(
+              count: alarmas.length,
+              isLabelVisible: true,
+              child: IconButton(
+                onPressed: () {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    constraints: BoxConstraints(
+                      maxWidth: double.infinity,
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    builder: (BuildContext context) => ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 40),
+                        //separatorBuilder: (context, index) => Divider(),
+                        itemCount: alarmas.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final alarma = alarmas[index];
+                          final entidadData = entidades
+                              .where((e) => e.name == alarma.entidad)
+                              .toList()
+                              .firstOrNull;
+                          return Card(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: ListTile(
+                                isThreeLine: true,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AlarmaAddScreen(
+                                        entidad: entidadData!,
+                                        editAlarma: alarma,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                title: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          BackgroundImage.getImage(entidadData),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      alarma.entidad,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Text(alarma.aviso),
+                                trailing: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  child: Text(
+                                    FechaUtil.dateToString(
+                                      date: alarma.fecha,
+                                      formato: 'd/MM/yy',
+                                    ),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  );
+                },
+                icon: Icon(Icons.alarm_on),
+              ),
+            ),
+          const SizedBox(width: 14),
+        ],
       ),
       body: Column(
         children: [

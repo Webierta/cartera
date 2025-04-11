@@ -1,5 +1,3 @@
-import 'package:carteradb/widgets/entidad_cuentas.dart';
-import 'package:carteradb/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +7,8 @@ import '../services/tablas.dart';
 import '../utils/number_util.dart';
 import '../widgets/background_image.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/entidad_cuentas.dart';
+import '../widgets/menu.dart';
 import '../widgets/sort_buttons.dart';
 import 'cartera_screen.dart';
 import 'cuenta_add_screen.dart';
