@@ -244,7 +244,7 @@ class _TablaScreenState extends State<TablaScreen> {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Text('${index + 1}'),
+                      child: Text('${historicoFiltro.length - index}'),
                     ),
                     Expanded(
                       flex: 2,

@@ -719,11 +719,8 @@ class HistoricoCartera extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 1,
-                  //child: Text('${index + 1}'),
                   child: CircleAvatar(
-                    child: Text(
-                      '${historicos.length - index}',
-                    ),
+                    child: Text('${historicos.length - index}'),
                   ),
                 ),
                 Expanded(
