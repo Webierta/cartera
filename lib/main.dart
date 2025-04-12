@@ -6,8 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'screens/cartera_screen.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
 import 'utils/local_storage.dart';
 
 void main() async {
@@ -93,7 +92,8 @@ class _MyAppState extends State<MyApp> {
         child = virtualWindowFrameBuilder(context, child);
         return child;
       },
-      home: loginRequerido ? const LoginScreen() : const CarteraScreen(),
+      //home: loginRequerido ? const LoginScreen() : const CarteraScreen(),
+      home: SplashScreen(loginRequerido: loginRequerido),
       //home: const CarteraScreen(),
     );
   }

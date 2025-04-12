@@ -8,9 +8,7 @@ class Wave extends StatelessWidget {
     return ClipPath(
       clipper: WaveClipper(),
       child: Container(
-        //color: Theme.of(context).primaryColor,
-        color: Theme.of(context).colorScheme.primary,
-        //color: Colors.deepPurple.shade600,
+        color: Theme.of(context).appBarTheme.backgroundColor,
         height: 200,
       ),
     );
