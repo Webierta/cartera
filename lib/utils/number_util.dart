@@ -73,4 +73,8 @@ class NumberUtil {
     return NumberFormat.compactCurrency(locale: locEs, symbol: '€')
         .format(number);
   }
+
+  static String signo(double num) {
+    return num < 0 ? '' : '+';
+  }
 }

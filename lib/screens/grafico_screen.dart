@@ -290,34 +290,50 @@ class _GraficoScreenState extends State<GraficoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gráfico Histórico'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButton<String>(
+                isDense: true,
+                value: filtroSelect,
+                alignment: Alignment.center,
+                onChanged: (String? value) {
+                  setState(() => filtroSelect = value ?? filtros.first);
+                  changeFiltroSelect();
+                },
+                underline: SizedBox(),
+                items: filtros
+                    .map((e) => DropdownMenuItem<String>(
+                          value: e,
+                          child: Text(e.toUpperCase()),
+                        ))
+                    .toList(),
+              ),
+            ),
+          )
+        ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            Wrap(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Leyenda(texto: 'Total', color: Colors.amber),
-                const Leyenda(texto: 'Cuentas', color: Colors.blue),
-                const Leyenda(texto: 'Depósitos', color: Colors.green),
-                const Leyenda(texto: 'Fondos', color: Colors.red),
-                const SizedBox(width: 60),
-                DropdownButton<String>(
-                  isDense: true,
-                  value: filtroSelect,
-                  alignment: Alignment.center,
-                  onChanged: (String? value) {
-                    setState(() => filtroSelect = value ?? filtros.first);
-                    changeFiltroSelect();
-                  },
-                  items: filtros
-                      .map((e) => DropdownMenuItem<String>(
-                            value: e,
-                            child: Text(e.toUpperCase()),
-                          ))
-                      .toList(),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Wrap(
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Leyenda(texto: 'Total', color: Colors.amber),
+                  Leyenda(texto: 'Cuentas', color: Colors.blue),
+                  Leyenda(texto: 'Depósitos', color: Colors.green),
+                  Leyenda(texto: 'Fondos', color: Colors.red),
+                  //SizedBox(width: 60),
+                ],
+              ),
             ),
             Expanded(
               child: SingleChildScrollView(

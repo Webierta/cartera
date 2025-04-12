@@ -12,6 +12,7 @@ import '../widgets/sort_buttons.dart';
 import 'alarma_add_screen.dart';
 import 'cartera_screen.dart';
 import 'entidad_add_screen.dart';
+import 'entidad_screen.dart';
 
 class EntidadesScreen extends ConsumerStatefulWidget {
   const EntidadesScreen({super.key});
@@ -243,33 +244,42 @@ class _EntidadesScreenState extends ConsumerState<EntidadesScreen> {
                               padding: const EdgeInsets.all(10.0),
                               child: ListTile(
                                 isThreeLine: true,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AlarmaAddScreen(
-                                        entidad: entidadData!,
-                                        editAlarma: alarma,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                title: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          BackgroundImage.getImage(entidadData),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      alarma.entidad,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                                leading: InkWell(
+                                  onTap: () {
+                                    entidadData != null
+                                        ? Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EntidadScreen(
+                                                      entidad: entidadData),
+                                            ))
+                                        : null;
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundImage:
+                                        BackgroundImage.getImage(entidadData),
+                                  ),
                                 ),
-                                subtitle: Text(alarma.aviso),
+                                title: Text(
+                                  alarma.entidad,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AlarmaAddScreen(
+                                            entidad: entidadData!,
+                                            editAlarma: alarma,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(alarma.aviso)),
                                 trailing: Container(
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 4),

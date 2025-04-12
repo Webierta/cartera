@@ -63,15 +63,11 @@ class _TablaScreenState extends State<TablaScreen> {
       }
     }
     return Text(
-      NumberUtil.currency(dif),
+      NumberUtil.signo(dif) + NumberUtil.currency(dif),
       maxLines: 1,
       textAlign: TextAlign.right,
-      style: TextStyle(color: dif < 0 ? Colors.red : Colors.black),
+      style: TextStyle(color: dif < 0 ? Colors.red : Colors.green.shade700),
     );
-  }
-
-  String signo(double num) {
-    return num < 0 ? '' : '+';
   }
 
   Widget porcentageDif(HistoricoData balance) {
@@ -89,7 +85,10 @@ class _TablaScreenState extends State<TablaScreen> {
         dif / total(historicoFiltro[historicoFiltro.indexOf(balance) + 1]);
     //(historicoFiltro[historicoFiltro.indexOf(balance) + 1].total ?? 0);
 
-    return Text(signo(por) + NumberUtil.percent(por));
+    return Text(
+      NumberUtil.signo(por) + NumberUtil.percent(por),
+      style: TextStyle(color: dif < 0 ? Colors.red : Colors.green.shade700),
+    );
   }
 
   void changeFiltroSelect() {
@@ -137,14 +136,75 @@ class _TablaScreenState extends State<TablaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tabla Histórico'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const ScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-          child: Column(
-            children: [
-              DropdownButton<String>(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(32.0),
+          child: Container(
+            //color: Theme.of(context).primaryColor,
+            padding: const EdgeInsets.all(8),
+            child: const Row(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: Text(
+                      '#',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    )),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Fecha',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    'Cuentas',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    'Depósitos',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    'Fondos',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    'Total',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              //padding: const EdgeInsets.symmetric(vertical: 2),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButton<String>(
                 isDense: true,
                 value: filtroSelect,
                 alignment: Alignment.center,
@@ -152,6 +212,7 @@ class _TablaScreenState extends State<TablaScreen> {
                   setState(() => filtroSelect = value ?? filtros.first);
                   changeFiltroSelect();
                 },
+                underline: SizedBox(),
                 items: filtros
                     .map((e) => DropdownMenuItem<String>(
                           value: e,
@@ -159,151 +220,124 @@ class _TablaScreenState extends State<TablaScreen> {
                         ))
                     .toList(),
               ),
-              const SizedBox(height: 20),
-              Container(
-                color: Theme.of(context).highlightColor,
-                child: const Row(
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const ScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+          //padding: const EdgeInsets.all(20),
+          child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            separatorBuilder: (context, index) => const Divider(),
+            itemCount: historicoFiltro.length,
+            itemBuilder: (context, index) {
+              final balance = historicoFiltro[index];
+              return SizedBox(
+                height: 80,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(flex: 1, child: Text('#')),
+                    Expanded(
+                      flex: 1,
+                      child: Text('${index + 1}'),
+                    ),
                     Expanded(
                       flex: 2,
-                      child: Text('Fecha', textAlign: TextAlign.center),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Text('Cuentas', textAlign: TextAlign.center),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Text('Depósitos', textAlign: TextAlign.center),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Text('Fondos', textAlign: TextAlign.center),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Text('Total', textAlign: TextAlign.center),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                separatorBuilder: (context, index) => const Divider(),
-                itemCount: historicoFiltro.length,
-                itemBuilder: (context, index) {
-                  final balance = historicoFiltro[index];
-                  return SizedBox(
-                    height: 80,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Text('${index + 1}'),
+                      child: Text(
+                        FechaUtil.dateToString(
+                          date: balance.fecha,
+                          formato: formato,
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            FechaUtil.dateToString(
-                              date: balance.fecha,
-                              formato: formato,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            NumberUtil.currency(balance.totalCuentas),
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                             textAlign: TextAlign.right,
                           ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(balance.totalCuentas),
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.right,
-                              ),
-                              difProducto(balance,
-                                  producto: TipoProducto.cuenta),
-                              Porcentage(
-                                  num: balance.totalCuentas / total(balance)),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(balance.totalDepositos),
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.right,
-                              ),
-                              difProducto(balance,
-                                  producto: TipoProducto.deposito),
-                              Porcentage(
-                                  num: balance.totalDepositos / total(balance)),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(balance.totalFondos),
-                                maxLines: 1,
-                                textAlign: TextAlign.right,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              difProducto(balance,
-                                  producto: TipoProducto.fondo),
-                              Porcentage(
-                                  num: balance.totalFondos / total(balance))
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                NumberUtil.currency(total(balance)),
-                                maxLines: 1,
-                                textAlign: TextAlign.right,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              difProducto(balance),
-                              porcentageDif(balance),
-                            ],
-                          ),
-                        ),
-                      ],
+                          difProducto(balance, producto: TipoProducto.cuenta),
+                          Porcentage(
+                              num: balance.totalCuentas / total(balance)),
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
-            ],
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            NumberUtil.currency(balance.totalDepositos),
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          difProducto(balance, producto: TipoProducto.deposito),
+                          Porcentage(
+                              num: balance.totalDepositos / total(balance)),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            NumberUtil.currency(balance.totalFondos),
+                            maxLines: 1,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          difProducto(balance, producto: TipoProducto.fondo),
+                          Porcentage(num: balance.totalFondos / total(balance))
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            NumberUtil.currency(total(balance)),
+                            maxLines: 1,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          difProducto(balance),
+                          porcentageDif(balance),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),

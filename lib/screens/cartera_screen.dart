@@ -464,32 +464,57 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             ),
             const SizedBox(height: 20),
             Container(
-              color: Theme.of(context).highlightColor,
-              child: const Row(
+              //color: Theme.of(context).highlightColor,
+              color: Theme.of(context).colorScheme.primary,
+              child: Row(
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Text('#', textAlign: TextAlign.center),
+                    child: Text(
+                      '#',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     flex: 3,
-                    child: Text('Fecha', textAlign: TextAlign.center),
+                    child: Text(
+                      'Fecha',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     flex: 5,
-                    child: Text('Cuentas', textAlign: TextAlign.center),
+                    child: Text(
+                      'Cuentas',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     flex: 5,
-                    child: Text('Depósitos', textAlign: TextAlign.center),
+                    child: Text(
+                      'Depósitos',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     flex: 5,
-                    child: Text('Fondos', textAlign: TextAlign.center),
+                    child: Text(
+                      'Fondos',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     flex: 5,
-                    child: Text('Total', textAlign: TextAlign.center),
+                    child: Text(
+                      'Total',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -513,6 +538,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).colorScheme.inversePrimary,
         child: Row(
           children: [
             Expanded(
@@ -589,9 +615,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
               ),
             ),
             IconButton(
-              onPressed: () {
-                addHistorico();
-              },
+              onPressed: () => addHistorico(),
               icon: const Icon(Icons.add_to_photos, size: 40),
             ),
           ],
@@ -645,7 +669,7 @@ class HistoricoCartera extends StatelessWidget {
       }
     }
     return Text(
-      NumberUtil.currency(dif),
+      NumberUtil.signo(dif) + NumberUtil.currency(dif),
       textAlign: TextAlign.right,
       style: TextStyle(color: dif < 0 ? Colors.red : Colors.green),
     );
