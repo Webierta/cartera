@@ -16,6 +16,23 @@ enum Titular { jcv, rpp, ambos }
 
 enum TipoOp { suscripcion, reembolso }
 
+class IRPF extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get ejercicio => integer()();
+  //TextColumn get titular => textEnum<Titular>()();
+  TextColumn get titular =>
+      textEnum<Titular>().nullable().clientDefault(() => Titular.ambos.name)();
+  // TextColumn get tipoProducto => textEnum<TipoProducto>()();
+  /* IntColumn get cuenta => integer().nullable().references(Cuenta, #id)();
+  IntColumn get deposito => integer().nullable().references(Deposito, #id)();
+  IntColumn get fondo => integer().nullable().references(Fondo, #id)(); */
+  TextColumn get entidad => text().references(Entidad, #name)();
+  TextColumn get tipoProducto => textEnum<TipoProducto>()();
+  TextColumn get codigo => text()(); // codigo? o nombre
+  RealColumn get rendimiento => real()();
+  RealColumn get rentencion => real()();
+}
+
 class Alarma extends Table {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get fecha => dateTime()();

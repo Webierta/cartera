@@ -22,7 +22,7 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   splashTimer() {
-    Timer(Duration(seconds: 3), () async {
+    Timer(Duration(seconds: 2), () async {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(

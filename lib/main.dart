@@ -23,7 +23,7 @@ void main() async {
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.normal,
     windowButtonVisibility: true,
-    title: 'Cartera Linux',
+    title: 'Mi Cartera',
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();

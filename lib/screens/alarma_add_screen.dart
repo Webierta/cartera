@@ -48,9 +48,7 @@ class _AlarmaAddScreenState extends ConsumerState<AlarmaAddScreen> {
   Future<void> addAlarma() async {
     if (avisoController.text.trim().isEmpty || fechaController.text.isEmpty) {
       if (!mounted) return;
-      const snackBar = SnackBar(
-        content: Text('Faltan datos de la Alarma'),
-      );
+      const snackBar = SnackBar(content: Text('Faltan datos de la Alarma'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }

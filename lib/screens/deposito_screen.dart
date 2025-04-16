@@ -9,6 +9,7 @@ import '../widgets/confirm_dialog.dart';
 import '../widgets/menu.dart';
 import 'deposito_add_screen.dart';
 import 'depositos_screen.dart';
+import 'irpf_add_screen.dart';
 
 class DepositoScreen extends ConsumerStatefulWidget {
   final DepositoData deposito;
@@ -72,6 +73,21 @@ class _DepositoScreenState extends ConsumerState<DepositoScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => IRPFAddScreen(
+                    entidad: widget.deposito.entidad,
+                    tipoProducto: TipoProducto.deposito,
+                    codigo: widget.deposito.codigo ?? '-',
+                  ),
+                ),
+              );
+            },
+            child: Text('IRPF'),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             offset: Offset(0.0, AppBar().preferredSize.height),
@@ -176,12 +192,27 @@ class _DepositoScreenState extends ConsumerState<DepositoScreen> {
                             .inDays) +
                         0.0,
                     value: (widget.deposito.vencimiento
-                            .difference(widget.deposito.inicio)
-                            .inDays) -
-                        (widget.deposito.vencimiento
-                            .difference(DateTime.now())
-                            .inDays) +
-                        0.0,
+                                    .difference(widget.deposito.inicio)
+                                    .inDays) -
+                                (widget.deposito.vencimiento
+                                    .difference(DateTime.now())
+                                    .inDays) +
+                                0.0 >
+                            (widget.deposito.vencimiento
+                                    .difference(widget.deposito.inicio)
+                                    .inDays) +
+                                0.0
+                        ? (widget.deposito.vencimiento
+                                .difference(widget.deposito.inicio)
+                                .inDays) +
+                            0.0
+                        : (widget.deposito.vencimiento
+                                .difference(widget.deposito.inicio)
+                                .inDays) -
+                            (widget.deposito.vencimiento
+                                .difference(DateTime.now())
+                                .inDays) +
+                            0.0,
                     onChanged: (double value) {},
                     label: 'Quedan ${getPendiente().$1} ${getPendiente().$2}',
                   ),

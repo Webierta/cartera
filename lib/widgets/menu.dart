@@ -6,7 +6,8 @@ enum Menu {
   eliminar(Icons.delete_forever),
   editar(Icons.edit),
   limpiar(Icons.cleaning_services),
-  ajustes(Icons.settings);
+  ajustes(Icons.settings),
+  irpf(Icons.rate_review);
   //info(Icons.info);
 
   final IconData icon;
@@ -25,7 +26,9 @@ class MenuItem {
             dense: true,
             leading: Icon(menu.icon),
             title: Text(
-              '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
+              menu == Menu.irpf
+                  ? menu.name.toUpperCase()
+                  : '${menu.name[0].toUpperCase()}${menu.name.substring(1)}',
               maxLines: 1,
             ),
           ),

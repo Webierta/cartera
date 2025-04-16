@@ -21,6 +21,7 @@ import 'depositos_screen.dart';
 import 'entidades_screen.dart';
 import 'fondos_screen.dart';
 import 'grafico_screen.dart';
+import 'irpf_screen.dart';
 import 'settings_screen.dart';
 import 'tabla_screen.dart';
 
@@ -350,12 +351,24 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
             },
             icon: const Icon(Icons.timeline),
           ),
+          /* IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => IRPFScreen(),
+                ),
+              );
+            },
+            icon: Icon(Icons.rate_review),
+          ), */
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             offset: Offset(0.0, AppBar().preferredSize.height),
             //shape: AppBox.roundBorder,
             itemBuilder: (ctx) => [
               MenuItem.buildMenuItem(Menu.ajustes, divider: true),
+              MenuItem.buildMenuItem(Menu.irpf, divider: true),
               MenuItem.buildMenuItem(Menu.exportar),
               MenuItem.buildMenuItem(Menu.importar, divider: true),
               MenuItem.buildMenuItem(Menu.eliminar),
@@ -373,6 +386,13 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              } else if (item == Menu.irpf) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => IRPFScreen(),
                   ),
                 );
               }

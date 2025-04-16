@@ -10,6 +10,7 @@ import '../widgets/confirm_dialog.dart';
 import '../widgets/menu.dart';
 import 'cuenta_add_screen.dart';
 import 'cuentas_screen.dart';
+import 'irpf_add_screen.dart';
 
 class CuentaScreen extends ConsumerStatefulWidget {
   final CuentaData cuenta;
@@ -101,6 +102,21 @@ class _CuentaScreenState extends ConsumerState<CuentaScreen> {
           icon: const Icon(Icons.arrow_back),
         ), */
         actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => IRPFAddScreen(
+                    entidad: widget.cuenta.entidad,
+                    tipoProducto: TipoProducto.cuenta,
+                    codigo: widget.cuenta.iban,
+                  ),
+                ),
+              );
+            },
+            child: Text('IRPF'),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             offset: Offset(0.0, AppBar().preferredSize.height),

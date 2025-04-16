@@ -2825,6 +2825,446 @@ class AlarmaCompanion extends UpdateCompanion<AlarmaData> {
   }
 }
 
+class $IRPFTable extends IRPF with TableInfo<$IRPFTable, IRPFData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IRPFTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _ejercicioMeta =
+      const VerificationMeta('ejercicio');
+  @override
+  late final GeneratedColumn<int> ejercicio = GeneratedColumn<int>(
+      'ejercicio', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumnWithTypeConverter<Titular?, String> titular =
+      GeneratedColumn<String>('titular', aliasedName, true,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              clientDefault: () => Titular.ambos.name)
+          .withConverter<Titular?>($IRPFTable.$convertertitularn);
+  static const VerificationMeta _entidadMeta =
+      const VerificationMeta('entidad');
+  @override
+  late final GeneratedColumn<String> entidad = GeneratedColumn<String>(
+      'entidad', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES entidad (name)'));
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoProducto, String>
+      tipoProducto = GeneratedColumn<String>(
+              'tipo_producto', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<TipoProducto>($IRPFTable.$convertertipoProducto);
+  static const VerificationMeta _codigoMeta = const VerificationMeta('codigo');
+  @override
+  late final GeneratedColumn<String> codigo = GeneratedColumn<String>(
+      'codigo', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _rendimientoMeta =
+      const VerificationMeta('rendimiento');
+  @override
+  late final GeneratedColumn<double> rendimiento = GeneratedColumn<double>(
+      'rendimiento', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _rentencionMeta =
+      const VerificationMeta('rentencion');
+  @override
+  late final GeneratedColumn<double> rentencion = GeneratedColumn<double>(
+      'rentencion', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        ejercicio,
+        titular,
+        entidad,
+        tipoProducto,
+        codigo,
+        rendimiento,
+        rentencion
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'irpf';
+  @override
+  VerificationContext validateIntegrity(Insertable<IRPFData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('ejercicio')) {
+      context.handle(_ejercicioMeta,
+          ejercicio.isAcceptableOrUnknown(data['ejercicio']!, _ejercicioMeta));
+    } else if (isInserting) {
+      context.missing(_ejercicioMeta);
+    }
+    if (data.containsKey('entidad')) {
+      context.handle(_entidadMeta,
+          entidad.isAcceptableOrUnknown(data['entidad']!, _entidadMeta));
+    } else if (isInserting) {
+      context.missing(_entidadMeta);
+    }
+    if (data.containsKey('codigo')) {
+      context.handle(_codigoMeta,
+          codigo.isAcceptableOrUnknown(data['codigo']!, _codigoMeta));
+    } else if (isInserting) {
+      context.missing(_codigoMeta);
+    }
+    if (data.containsKey('rendimiento')) {
+      context.handle(
+          _rendimientoMeta,
+          rendimiento.isAcceptableOrUnknown(
+              data['rendimiento']!, _rendimientoMeta));
+    } else if (isInserting) {
+      context.missing(_rendimientoMeta);
+    }
+    if (data.containsKey('rentencion')) {
+      context.handle(
+          _rentencionMeta,
+          rentencion.isAcceptableOrUnknown(
+              data['rentencion']!, _rentencionMeta));
+    } else if (isInserting) {
+      context.missing(_rentencionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  IRPFData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IRPFData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      ejercicio: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}ejercicio'])!,
+      titular: $IRPFTable.$convertertitularn.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}titular'])),
+      entidad: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entidad'])!,
+      tipoProducto: $IRPFTable.$convertertipoProducto.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tipo_producto'])!),
+      codigo: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}codigo'])!,
+      rendimiento: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}rendimiento'])!,
+      rentencion: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}rentencion'])!,
+    );
+  }
+
+  @override
+  $IRPFTable createAlias(String alias) {
+    return $IRPFTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<Titular, String, String> $convertertitular =
+      const EnumNameConverter<Titular>(Titular.values);
+  static JsonTypeConverter2<Titular?, String?, String?> $convertertitularn =
+      JsonTypeConverter2.asNullable($convertertitular);
+  static JsonTypeConverter2<TipoProducto, String, String>
+      $convertertipoProducto =
+      const EnumNameConverter<TipoProducto>(TipoProducto.values);
+}
+
+class IRPFData extends DataClass implements Insertable<IRPFData> {
+  final int id;
+  final int ejercicio;
+  final Titular? titular;
+  final String entidad;
+  final TipoProducto tipoProducto;
+  final String codigo;
+  final double rendimiento;
+  final double rentencion;
+  const IRPFData(
+      {required this.id,
+      required this.ejercicio,
+      this.titular,
+      required this.entidad,
+      required this.tipoProducto,
+      required this.codigo,
+      required this.rendimiento,
+      required this.rentencion});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['ejercicio'] = Variable<int>(ejercicio);
+    if (!nullToAbsent || titular != null) {
+      map['titular'] =
+          Variable<String>($IRPFTable.$convertertitularn.toSql(titular));
+    }
+    map['entidad'] = Variable<String>(entidad);
+    {
+      map['tipo_producto'] = Variable<String>(
+          $IRPFTable.$convertertipoProducto.toSql(tipoProducto));
+    }
+    map['codigo'] = Variable<String>(codigo);
+    map['rendimiento'] = Variable<double>(rendimiento);
+    map['rentencion'] = Variable<double>(rentencion);
+    return map;
+  }
+
+  IRPFCompanion toCompanion(bool nullToAbsent) {
+    return IRPFCompanion(
+      id: Value(id),
+      ejercicio: Value(ejercicio),
+      titular: titular == null && nullToAbsent
+          ? const Value.absent()
+          : Value(titular),
+      entidad: Value(entidad),
+      tipoProducto: Value(tipoProducto),
+      codigo: Value(codigo),
+      rendimiento: Value(rendimiento),
+      rentencion: Value(rentencion),
+    );
+  }
+
+  factory IRPFData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IRPFData(
+      id: serializer.fromJson<int>(json['id']),
+      ejercicio: serializer.fromJson<int>(json['ejercicio']),
+      titular: $IRPFTable.$convertertitularn
+          .fromJson(serializer.fromJson<String?>(json['titular'])),
+      entidad: serializer.fromJson<String>(json['entidad']),
+      tipoProducto: $IRPFTable.$convertertipoProducto
+          .fromJson(serializer.fromJson<String>(json['tipoProducto'])),
+      codigo: serializer.fromJson<String>(json['codigo']),
+      rendimiento: serializer.fromJson<double>(json['rendimiento']),
+      rentencion: serializer.fromJson<double>(json['rentencion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'ejercicio': serializer.toJson<int>(ejercicio),
+      'titular': serializer
+          .toJson<String?>($IRPFTable.$convertertitularn.toJson(titular)),
+      'entidad': serializer.toJson<String>(entidad),
+      'tipoProducto': serializer.toJson<String>(
+          $IRPFTable.$convertertipoProducto.toJson(tipoProducto)),
+      'codigo': serializer.toJson<String>(codigo),
+      'rendimiento': serializer.toJson<double>(rendimiento),
+      'rentencion': serializer.toJson<double>(rentencion),
+    };
+  }
+
+  IRPFData copyWith(
+          {int? id,
+          int? ejercicio,
+          Value<Titular?> titular = const Value.absent(),
+          String? entidad,
+          TipoProducto? tipoProducto,
+          String? codigo,
+          double? rendimiento,
+          double? rentencion}) =>
+      IRPFData(
+        id: id ?? this.id,
+        ejercicio: ejercicio ?? this.ejercicio,
+        titular: titular.present ? titular.value : this.titular,
+        entidad: entidad ?? this.entidad,
+        tipoProducto: tipoProducto ?? this.tipoProducto,
+        codigo: codigo ?? this.codigo,
+        rendimiento: rendimiento ?? this.rendimiento,
+        rentencion: rentencion ?? this.rentencion,
+      );
+  IRPFData copyWithCompanion(IRPFCompanion data) {
+    return IRPFData(
+      id: data.id.present ? data.id.value : this.id,
+      ejercicio: data.ejercicio.present ? data.ejercicio.value : this.ejercicio,
+      titular: data.titular.present ? data.titular.value : this.titular,
+      entidad: data.entidad.present ? data.entidad.value : this.entidad,
+      tipoProducto: data.tipoProducto.present
+          ? data.tipoProducto.value
+          : this.tipoProducto,
+      codigo: data.codigo.present ? data.codigo.value : this.codigo,
+      rendimiento:
+          data.rendimiento.present ? data.rendimiento.value : this.rendimiento,
+      rentencion:
+          data.rentencion.present ? data.rentencion.value : this.rentencion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IRPFData(')
+          ..write('id: $id, ')
+          ..write('ejercicio: $ejercicio, ')
+          ..write('titular: $titular, ')
+          ..write('entidad: $entidad, ')
+          ..write('tipoProducto: $tipoProducto, ')
+          ..write('codigo: $codigo, ')
+          ..write('rendimiento: $rendimiento, ')
+          ..write('rentencion: $rentencion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, ejercicio, titular, entidad, tipoProducto,
+      codigo, rendimiento, rentencion);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IRPFData &&
+          other.id == this.id &&
+          other.ejercicio == this.ejercicio &&
+          other.titular == this.titular &&
+          other.entidad == this.entidad &&
+          other.tipoProducto == this.tipoProducto &&
+          other.codigo == this.codigo &&
+          other.rendimiento == this.rendimiento &&
+          other.rentencion == this.rentencion);
+}
+
+class IRPFCompanion extends UpdateCompanion<IRPFData> {
+  final Value<int> id;
+  final Value<int> ejercicio;
+  final Value<Titular?> titular;
+  final Value<String> entidad;
+  final Value<TipoProducto> tipoProducto;
+  final Value<String> codigo;
+  final Value<double> rendimiento;
+  final Value<double> rentencion;
+  const IRPFCompanion({
+    this.id = const Value.absent(),
+    this.ejercicio = const Value.absent(),
+    this.titular = const Value.absent(),
+    this.entidad = const Value.absent(),
+    this.tipoProducto = const Value.absent(),
+    this.codigo = const Value.absent(),
+    this.rendimiento = const Value.absent(),
+    this.rentencion = const Value.absent(),
+  });
+  IRPFCompanion.insert({
+    this.id = const Value.absent(),
+    required int ejercicio,
+    this.titular = const Value.absent(),
+    required String entidad,
+    required TipoProducto tipoProducto,
+    required String codigo,
+    required double rendimiento,
+    required double rentencion,
+  })  : ejercicio = Value(ejercicio),
+        entidad = Value(entidad),
+        tipoProducto = Value(tipoProducto),
+        codigo = Value(codigo),
+        rendimiento = Value(rendimiento),
+        rentencion = Value(rentencion);
+  static Insertable<IRPFData> custom({
+    Expression<int>? id,
+    Expression<int>? ejercicio,
+    Expression<String>? titular,
+    Expression<String>? entidad,
+    Expression<String>? tipoProducto,
+    Expression<String>? codigo,
+    Expression<double>? rendimiento,
+    Expression<double>? rentencion,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ejercicio != null) 'ejercicio': ejercicio,
+      if (titular != null) 'titular': titular,
+      if (entidad != null) 'entidad': entidad,
+      if (tipoProducto != null) 'tipo_producto': tipoProducto,
+      if (codigo != null) 'codigo': codigo,
+      if (rendimiento != null) 'rendimiento': rendimiento,
+      if (rentencion != null) 'rentencion': rentencion,
+    });
+  }
+
+  IRPFCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? ejercicio,
+      Value<Titular?>? titular,
+      Value<String>? entidad,
+      Value<TipoProducto>? tipoProducto,
+      Value<String>? codigo,
+      Value<double>? rendimiento,
+      Value<double>? rentencion}) {
+    return IRPFCompanion(
+      id: id ?? this.id,
+      ejercicio: ejercicio ?? this.ejercicio,
+      titular: titular ?? this.titular,
+      entidad: entidad ?? this.entidad,
+      tipoProducto: tipoProducto ?? this.tipoProducto,
+      codigo: codigo ?? this.codigo,
+      rendimiento: rendimiento ?? this.rendimiento,
+      rentencion: rentencion ?? this.rentencion,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (ejercicio.present) {
+      map['ejercicio'] = Variable<int>(ejercicio.value);
+    }
+    if (titular.present) {
+      map['titular'] =
+          Variable<String>($IRPFTable.$convertertitularn.toSql(titular.value));
+    }
+    if (entidad.present) {
+      map['entidad'] = Variable<String>(entidad.value);
+    }
+    if (tipoProducto.present) {
+      map['tipo_producto'] = Variable<String>(
+          $IRPFTable.$convertertipoProducto.toSql(tipoProducto.value));
+    }
+    if (codigo.present) {
+      map['codigo'] = Variable<String>(codigo.value);
+    }
+    if (rendimiento.present) {
+      map['rendimiento'] = Variable<double>(rendimiento.value);
+    }
+    if (rentencion.present) {
+      map['rentencion'] = Variable<double>(rentencion.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IRPFCompanion(')
+          ..write('id: $id, ')
+          ..write('ejercicio: $ejercicio, ')
+          ..write('titular: $titular, ')
+          ..write('entidad: $entidad, ')
+          ..write('tipoProducto: $tipoProducto, ')
+          ..write('codigo: $codigo, ')
+          ..write('rendimiento: $rendimiento, ')
+          ..write('rentencion: $rentencion')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2836,6 +3276,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ValoresFondoTable valoresFondo = $ValoresFondoTable(this);
   late final $HistoricoTable historico = $HistoricoTable(this);
   late final $AlarmaTable alarma = $AlarmaTable(this);
+  late final $IRPFTable irpf = $IRPFTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2848,7 +3289,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         fondo,
         valoresFondo,
         historico,
-        alarma
+        alarma,
+        irpf
       ];
 }
 
@@ -2928,6 +3370,20 @@ final class $$EntidadTableReferences
         .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
 
     final cache = $_typedResult.readTableOrNull(_alarmaRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$IRPFTable, List<IRPFData>> _irpfRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.irpf,
+          aliasName: $_aliasNameGenerator(db.entidad.name, db.irpf.entidad));
+
+  $$IRPFTableProcessedTableManager get irpfRefs {
+    final manager = $$IRPFTableTableManager($_db, $_db.irpf)
+        .filter((f) => f.entidad.name.sqlEquals($_itemColumn<String>('name')!));
+
+    final cache = $_typedResult.readTableOrNull(_irpfRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -3039,6 +3495,27 @@ class $$EntidadTableFilterComposer
             $$AlarmaTableFilterComposer(
               $db: $db,
               $table: $db.alarma,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> irpfRefs(
+      Expression<bool> Function($$IRPFTableFilterComposer f) f) {
+    final $$IRPFTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.irpf,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$IRPFTableFilterComposer(
+              $db: $db,
+              $table: $db.irpf,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -3192,6 +3669,27 @@ class $$EntidadTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> irpfRefs<T extends Object>(
+      Expression<T> Function($$IRPFTableAnnotationComposer a) f) {
+    final $$IRPFTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.name,
+        referencedTable: $db.irpf,
+        getReferencedColumn: (t) => t.entidad,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$IRPFTableAnnotationComposer(
+              $db: $db,
+              $table: $db.irpf,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$EntidadTableTableManager extends RootTableManager<
@@ -3209,7 +3707,8 @@ class $$EntidadTableTableManager extends RootTableManager<
         {bool cuentaRefs,
         bool depositoRefs,
         bool fondoRefs,
-        bool alarmaRefs})> {
+        bool alarmaRefs,
+        bool irpfRefs})> {
   $$EntidadTableTableManager(_$AppDatabase db, $EntidadTable table)
       : super(TableManagerState(
           db: db,
@@ -3264,14 +3763,16 @@ class $$EntidadTableTableManager extends RootTableManager<
               {cuentaRefs = false,
               depositoRefs = false,
               fondoRefs = false,
-              alarmaRefs = false}) {
+              alarmaRefs = false,
+              irpfRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (cuentaRefs) db.cuenta,
                 if (depositoRefs) db.deposito,
                 if (fondoRefs) db.fondo,
-                if (alarmaRefs) db.alarma
+                if (alarmaRefs) db.alarma,
+                if (irpfRefs) db.irpf
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
@@ -3324,6 +3825,18 @@ class $$EntidadTableTableManager extends RootTableManager<
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.entidad == item.name),
+                        typedResults: items),
+                  if (irpfRefs)
+                    await $_getPrefetchedData<EntidadData, $EntidadTable,
+                            IRPFData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$EntidadTableReferences._irpfRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$EntidadTableReferences(db, table, p0).irpfRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.entidad == item.name),
                         typedResults: items)
                 ];
               },
@@ -3344,7 +3857,11 @@ typedef $$EntidadTableProcessedTableManager = ProcessedTableManager<
     (EntidadData, $$EntidadTableReferences),
     EntidadData,
     PrefetchHooks Function(
-        {bool cuentaRefs, bool depositoRefs, bool fondoRefs, bool alarmaRefs})>;
+        {bool cuentaRefs,
+        bool depositoRefs,
+        bool fondoRefs,
+        bool alarmaRefs,
+        bool irpfRefs})>;
 typedef $$CuentaTableCreateCompanionBuilder = CuentaCompanion Function({
   Value<int> id,
   required String name,
@@ -5376,6 +5893,318 @@ typedef $$AlarmaTableProcessedTableManager = ProcessedTableManager<
     (AlarmaData, $$AlarmaTableReferences),
     AlarmaData,
     PrefetchHooks Function({bool entidad})>;
+typedef $$IRPFTableCreateCompanionBuilder = IRPFCompanion Function({
+  Value<int> id,
+  required int ejercicio,
+  Value<Titular?> titular,
+  required String entidad,
+  required TipoProducto tipoProducto,
+  required String codigo,
+  required double rendimiento,
+  required double rentencion,
+});
+typedef $$IRPFTableUpdateCompanionBuilder = IRPFCompanion Function({
+  Value<int> id,
+  Value<int> ejercicio,
+  Value<Titular?> titular,
+  Value<String> entidad,
+  Value<TipoProducto> tipoProducto,
+  Value<String> codigo,
+  Value<double> rendimiento,
+  Value<double> rentencion,
+});
+
+final class $$IRPFTableReferences
+    extends BaseReferences<_$AppDatabase, $IRPFTable, IRPFData> {
+  $$IRPFTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EntidadTable _entidadTable(_$AppDatabase db) => db.entidad
+      .createAlias($_aliasNameGenerator(db.irpf.entidad, db.entidad.name));
+
+  $$EntidadTableProcessedTableManager get entidad {
+    final $_column = $_itemColumn<String>('entidad')!;
+
+    final manager = $$EntidadTableTableManager($_db, $_db.entidad)
+        .filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entidadTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$IRPFTableFilterComposer extends Composer<_$AppDatabase, $IRPFTable> {
+  $$IRPFTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get ejercicio => $composableBuilder(
+      column: $table.ejercicio, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Titular?, Titular, String> get titular =>
+      $composableBuilder(
+          column: $table.titular,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnWithTypeConverterFilters<TipoProducto, TipoProducto, String>
+      get tipoProducto => $composableBuilder(
+          column: $table.tipoProducto,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<String> get codigo => $composableBuilder(
+      column: $table.codigo, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get rendimiento => $composableBuilder(
+      column: $table.rendimiento, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get rentencion => $composableBuilder(
+      column: $table.rentencion, builder: (column) => ColumnFilters(column));
+
+  $$EntidadTableFilterComposer get entidad {
+    final $$EntidadTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableFilterComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$IRPFTableOrderingComposer extends Composer<_$AppDatabase, $IRPFTable> {
+  $$IRPFTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get ejercicio => $composableBuilder(
+      column: $table.ejercicio, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get titular => $composableBuilder(
+      column: $table.titular, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get tipoProducto => $composableBuilder(
+      column: $table.tipoProducto,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get codigo => $composableBuilder(
+      column: $table.codigo, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get rendimiento => $composableBuilder(
+      column: $table.rendimiento, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get rentencion => $composableBuilder(
+      column: $table.rentencion, builder: (column) => ColumnOrderings(column));
+
+  $$EntidadTableOrderingComposer get entidad {
+    final $$EntidadTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableOrderingComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$IRPFTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IRPFTable> {
+  $$IRPFTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get ejercicio =>
+      $composableBuilder(column: $table.ejercicio, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Titular?, String> get titular =>
+      $composableBuilder(column: $table.titular, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoProducto, String> get tipoProducto =>
+      $composableBuilder(
+          column: $table.tipoProducto, builder: (column) => column);
+
+  GeneratedColumn<String> get codigo =>
+      $composableBuilder(column: $table.codigo, builder: (column) => column);
+
+  GeneratedColumn<double> get rendimiento => $composableBuilder(
+      column: $table.rendimiento, builder: (column) => column);
+
+  GeneratedColumn<double> get rentencion => $composableBuilder(
+      column: $table.rentencion, builder: (column) => column);
+
+  $$EntidadTableAnnotationComposer get entidad {
+    final $$EntidadTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.entidad,
+        referencedTable: $db.entidad,
+        getReferencedColumn: (t) => t.name,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$EntidadTableAnnotationComposer(
+              $db: $db,
+              $table: $db.entidad,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$IRPFTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $IRPFTable,
+    IRPFData,
+    $$IRPFTableFilterComposer,
+    $$IRPFTableOrderingComposer,
+    $$IRPFTableAnnotationComposer,
+    $$IRPFTableCreateCompanionBuilder,
+    $$IRPFTableUpdateCompanionBuilder,
+    (IRPFData, $$IRPFTableReferences),
+    IRPFData,
+    PrefetchHooks Function({bool entidad})> {
+  $$IRPFTableTableManager(_$AppDatabase db, $IRPFTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IRPFTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$IRPFTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$IRPFTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> ejercicio = const Value.absent(),
+            Value<Titular?> titular = const Value.absent(),
+            Value<String> entidad = const Value.absent(),
+            Value<TipoProducto> tipoProducto = const Value.absent(),
+            Value<String> codigo = const Value.absent(),
+            Value<double> rendimiento = const Value.absent(),
+            Value<double> rentencion = const Value.absent(),
+          }) =>
+              IRPFCompanion(
+            id: id,
+            ejercicio: ejercicio,
+            titular: titular,
+            entidad: entidad,
+            tipoProducto: tipoProducto,
+            codigo: codigo,
+            rendimiento: rendimiento,
+            rentencion: rentencion,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int ejercicio,
+            Value<Titular?> titular = const Value.absent(),
+            required String entidad,
+            required TipoProducto tipoProducto,
+            required String codigo,
+            required double rendimiento,
+            required double rentencion,
+          }) =>
+              IRPFCompanion.insert(
+            id: id,
+            ejercicio: ejercicio,
+            titular: titular,
+            entidad: entidad,
+            tipoProducto: tipoProducto,
+            codigo: codigo,
+            rendimiento: rendimiento,
+            rentencion: rentencion,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$IRPFTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({entidad = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (entidad) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.entidad,
+                    referencedTable: $$IRPFTableReferences._entidadTable(db),
+                    referencedColumn:
+                        $$IRPFTableReferences._entidadTable(db).name,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$IRPFTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $IRPFTable,
+    IRPFData,
+    $$IRPFTableFilterComposer,
+    $$IRPFTableOrderingComposer,
+    $$IRPFTableAnnotationComposer,
+    $$IRPFTableCreateCompanionBuilder,
+    $$IRPFTableUpdateCompanionBuilder,
+    (IRPFData, $$IRPFTableReferences),
+    IRPFData,
+    PrefetchHooks Function({bool entidad})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5396,4 +6225,5 @@ class $AppDatabaseManager {
       $$HistoricoTableTableManager(_db, _db.historico);
   $$AlarmaTableTableManager get alarma =>
       $$AlarmaTableTableManager(_db, _db.alarma);
+  $$IRPFTableTableManager get irpf => $$IRPFTableTableManager(_db, _db.irpf);
 }

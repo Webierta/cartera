@@ -36,13 +36,14 @@ part 'app_database.g.dart';
   ValoresFondo,
   Entidad,
   Historico,
-  Alarma
+  Alarma,
+  IRPF
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -55,8 +56,90 @@ class AppDatabase extends _$AppDatabase {
         if (from < 2) {
           await m.create(alarma);
         }
+        if (from < 3) {
+          await m.create(irpf);
+        }
+        if (from < 4) {
+          await m.addColumn(irpf, irpf.titular);
+        }
       },
     );
+  }
+
+  // IRPF
+  Future<List<IRPFData>> get allIRPF => select(irpf).get();
+
+  Future<List<IRPFData>> titularIRPF(Titular titular) {
+    if (titular == Titular.ambos) {
+      return allIRPF;
+    }
+
+    return (select(irpf)
+          ..where((s) => s.titular.equals(titular.name))
+          ..orderBy([
+            (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+          ]))
+        .get();
+  }
+
+  Future<List<IRPFData>> ejercicioIRPF(int ejercicio) {
+    return (select(irpf)
+          ..where((s) => s.ejercicio.equals(ejercicio))
+          ..orderBy([
+            (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+          ]))
+        .get();
+  }
+
+  Future<List<IRPFData>> entidadIRPF(String entidadName) {
+    return (select(irpf)
+          ..where((s) => s.entidad.equals(entidadName))
+          ..orderBy([
+            (s) =>
+                OrderingTerm(expression: s.ejercicio, mode: OrderingMode.desc)
+          ]))
+        .get();
+  }
+
+  Future<List<IRPFData>> ejercicioEntidadIRPF(
+      int ejercicio, String entidadName) {
+    return (select(irpf)
+          ..where((s) => s.ejercicio.equals(ejercicio))
+          ..where((s) => s.entidad.equals(entidadName))
+          ..orderBy([
+            (s) =>
+                OrderingTerm(expression: s.ejercicio, mode: OrderingMode.desc)
+          ]))
+        .get();
+  }
+
+  Future<List<IRPFData>> ejercicioEntidadTitularIRPF(
+      int ejercicio, String entidadName, Titular titular) {
+    return (select(irpf)
+          ..where((s) => s.ejercicio.equals(ejercicio))
+          ..where((s) => s.entidad.equals(entidadName))
+          ..where((s) => s.titular.equals(titular.name))
+          ..orderBy([
+            (s) =>
+                OrderingTerm(expression: s.ejercicio, mode: OrderingMode.desc)
+          ]))
+        .get();
+  }
+
+  Future<int> addIRPF(IRPFCompanion newIRPF) {
+    return into(irpf).insert(newIRPF);
+  }
+
+  Future<int> updateIRPF(int id, IRPFCompanion companion) {
+    return (update(irpf)..where((tbl) => tbl.id.equals(id))).write(companion);
+  }
+
+  Future<int> deleteIRPF(int id) {
+    return (delete(irpf)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<int> deleteAllIRPF() async {
+    return await delete(irpf).go();
   }
 
   // ALARMA
