@@ -69,14 +69,66 @@ class AppDatabase extends _$AppDatabase {
   // IRPF
   Future<List<IRPFData>> get allIRPF => select(irpf).get();
 
+  Future<List<IRPFData>> titularEjercicioIRPF(Titular titular, int? ejercicio) {
+    if (titular == Titular.ambos && ejercicio == null) {
+      return (select(irpf)
+            ..orderBy([
+              (s) => OrderingTerm(
+                  expression: s.ejercicio, mode: OrderingMode.desc),
+              (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+            ]))
+          .get();
+    } else if (titular == Titular.ambos && ejercicio != null) {
+      return (select(irpf)
+            ..where((s) => s.ejercicio.equals(ejercicio))
+            ..orderBy([
+              (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+            ]))
+          .get();
+    } else if (titular != Titular.ambos && ejercicio == null) {
+      return (select(irpf)
+            ..where((s) => s.titular.equals(titular.name))
+            ..orderBy([
+              (s) => OrderingTerm(
+                  expression: s.ejercicio, mode: OrderingMode.desc),
+              (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+            ]))
+          .get();
+    } else if (titular != Titular.ambos && ejercicio != null) {
+      return (select(irpf)
+            ..where((s) => s.ejercicio.equals(ejercicio))
+            ..where((s) => s.titular.equals(titular.name))
+            ..orderBy([
+              (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+            ]))
+          .get();
+    }
+    return (select(irpf)
+          ..orderBy([
+            (s) =>
+                OrderingTerm(expression: s.ejercicio, mode: OrderingMode.desc),
+            (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+          ]))
+        .get();
+  }
+
   Future<List<IRPFData>> titularIRPF(Titular titular) {
     if (titular == Titular.ambos) {
-      return allIRPF;
+      //return allIRPF;
+      return (select(irpf)
+            ..orderBy([
+              (s) => OrderingTerm(
+                  expression: s.ejercicio, mode: OrderingMode.desc),
+              (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
+            ]))
+          .get();
     }
 
     return (select(irpf)
           ..where((s) => s.titular.equals(titular.name))
           ..orderBy([
+            (s) =>
+                OrderingTerm(expression: s.ejercicio, mode: OrderingMode.desc),
             (s) => OrderingTerm(expression: s.entidad, mode: OrderingMode.asc)
           ]))
         .get();

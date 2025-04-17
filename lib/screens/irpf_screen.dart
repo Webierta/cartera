@@ -12,7 +12,8 @@ import 'cartera_screen.dart';
 
 class IRPFScreen extends ConsumerStatefulWidget {
   final Titular? titular;
-  const IRPFScreen({super.key, this.titular = Titular.ambos});
+  final int? ejercicio;
+  const IRPFScreen({super.key, this.titular = Titular.ambos, this.ejercicio});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _IRPFScreenState();
@@ -22,11 +23,14 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
   late AppDatabase database;
   List<IRPFData> irpf = [];
   Titular titularSelect = Titular.ambos;
+  int? ejercicioSelect;
+  Set<int?> ejerciciosSet = {};
 
   @override
   void initState() {
     database = ref.read(AppDatabase.provider);
     setTitular();
+    setEjercicio();
     loadIRPF();
     super.initState();
   }
@@ -37,14 +41,30 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
     });
   }
 
-  changeTitular() {}
+  setEjercicio() {
+    setState(() {
+      ejercicioSelect = widget.ejercicio;
+    });
+  }
+
+  void getEjerciciosSet() {
+    Set<int?> ejerciciosYear = {};
+    for (var renta in irpf) {
+      ejerciciosYear.add(renta.ejercicio);
+    }
+    if (ejerciciosYear.isNotEmpty) {
+      ejerciciosYear.add(null);
+    }
+    if (mounted) {
+      setState(() => ejerciciosSet = ejerciciosYear);
+    }
+  }
 
   loadIRPF() async {
     var irpfList = await database.allIRPF;
     if (mounted) {
-      setState(() {
-        irpf = irpfList;
-      });
+      setState(() => irpf = irpfList);
+      getEjerciciosSet();
     }
   }
 
@@ -90,6 +110,34 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
         ),
         title: const Text('IRPF'),
         actions: [
+          if (ejerciciosSet.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: DropdownButton<int?>(
+                  isDense: true,
+                  value: ejercicioSelect,
+                  alignment: Alignment.center,
+                  onChanged: (int? value) {
+                    setState(() => ejercicioSelect = value);
+                  },
+                  underline: SizedBox(),
+                  items: ejerciciosSet
+                      .toList()
+                      .reversed
+                      .map((e) => DropdownMenuItem<int?>(
+                            value: e,
+                            child: Text(e == null ? 'All' : e.toString()),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Container(
@@ -104,7 +152,6 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
                 alignment: Alignment.center,
                 onChanged: (Titular? value) {
                   setState(() => titularSelect = value ?? Titular.ambos);
-                  changeTitular();
                 },
                 underline: SizedBox(),
                 items: Titular.values.reversed
@@ -131,39 +178,20 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
           ),
         ],
       ),
-      /* body: Column(
-        children: [
-          if (irpf.isEmpty)
-            const Expanded(
-              child: Center(
-                child: Text('Ninguna registro a la vista'),
-              ),
-            ),
-          if (irpf.isNotEmpty)
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(20),
-                itemCount: irpf.length,
-                itemBuilder: (context, index) {
-                  final renta = irpf[index];
-                  return ListTile(
-                    title: Text(renta.ejercicio.toString()),
-                  );
-                },
-              ),
-            ),
-        ],
-      ), */
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: FutureBuilder<List<IRPFData>>(
           //future: database.allIRPF,
-          future: database.titularIRPF(titularSelect),
+          //future: database.titularIRPF(titularSelect),
+          future: database.titularEjercicioIRPF(titularSelect, ejercicioSelect),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
-              return ListadoIRPF(rentas: snapshot.data!);
+              return ListadoIRPF(
+                rentas: snapshot.data!,
+                ejercicio: ejercicioSelect,
+              );
             } else {
               return const Center(child: Text('No hay cuentas todavía'));
             }
@@ -176,7 +204,8 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
 
 class ListadoIRPF extends ConsumerStatefulWidget {
   final List<IRPFData> rentas;
-  const ListadoIRPF({super.key, required this.rentas});
+  final int? ejercicio;
+  const ListadoIRPF({super.key, required this.rentas, this.ejercicio});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ListadoIRPFState();
@@ -184,14 +213,12 @@ class ListadoIRPF extends ConsumerStatefulWidget {
 
 class _ListadoIRPFState extends ConsumerState<ListadoIRPF> {
   late AppDatabase database;
-  //Set<String> entidadesSet = {};
-  //List<EntidadData> entidades = [];
-
   Set<int> ejerciciosSet = {};
   double rendimientoEjercicio = 0;
   double retencionEjercicio = 0;
   Map<int, double> mapEjercicioRendimiento = {};
   Map<int, double> mapEjercicioRetencion = {};
+  Map<int, bool> mapEjercicioRegistros = {};
 
   @override
   void initState() {
@@ -204,14 +231,16 @@ class _ListadoIRPFState extends ConsumerState<ListadoIRPF> {
     for (var ejercicio in ejerciciosSet) {
       double rendimiento = 0;
       double retencion = 0;
-
       //final List<IRPFData> rentasEjercicio = await database.ejercicioIRPF(ejercicio);
-      for (var renta in widget.rentas) {
+      final List<IRPFData> rentasEjercicio =
+          widget.rentas.where((r) => r.ejercicio == ejercicio).toList();
+      for (var renta in rentasEjercicio) {
         rendimiento += renta.rendimiento;
         retencion += renta.rentencion;
       }
       if (mounted) {
         setState(() {
+          mapEjercicioRegistros[ejercicio] = rentasEjercicio.isNotEmpty;
           mapEjercicioRendimiento[ejercicio] = rendimiento;
           mapEjercicioRetencion[ejercicio] = retencion;
         });
@@ -220,27 +249,21 @@ class _ListadoIRPFState extends ConsumerState<ListadoIRPF> {
   }
 
   void getEjerciciosSet() {
-    Set<int> ejerciciosYear = {};
-    for (var renta in widget.rentas) {
-      ejerciciosYear.add(renta.ejercicio);
-    }
-    if (mounted) {
-      setState(() => ejerciciosSet = ejerciciosYear);
+    if (widget.ejercicio == null) {
+      Set<int> ejerciciosYear = {};
+      for (var renta in widget.rentas) {
+        ejerciciosYear.add(renta.ejercicio);
+      }
+      if (mounted) {
+        setState(() => ejerciciosSet = ejerciciosYear);
+      }
+    } else {
+      if (mounted) {
+        setState(() => ejerciciosSet.add(widget.ejercicio!));
+      }
     }
     loadEjercicioIRPF();
   }
-
-  /* void getEntidadesSet() async {
-    Set<String> entidadesNombres = {};
-    for (var renta in widget.rentas) {
-      entidadesNombres.add(renta.entidad);
-    }
-    List<EntidadData> allEntidades = await database.allEntidades;
-    setState(() {
-      entidadesSet = entidadesNombres;
-      entidades = allEntidades;
-    });
-  } */
 
   @override
   Widget build(BuildContext context) {
@@ -261,6 +284,15 @@ class _ListadoIRPFState extends ConsumerState<ListadoIRPF> {
             itemCount: ejerciciosSet.length,
             itemBuilder: (context, index) {
               final int ejercicio = ejerciciosSet.elementAt(index);
+              //final int ejercicio = ejerciciosSet.elementAt(ejerciciosSet.length - (index + 1));
+              if (mapEjercicioRegistros[ejercicio] == false) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Center(
+                    child: Text('Ningún registro a la vista'),
+                  ),
+                );
+              }
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
@@ -374,8 +406,12 @@ class _EjercicioIRPFState extends ConsumerState<EjercicioIRPF> {
         widget.ejercicio,
         entidad,
       ); */
+      final List<IRPFData> rentasEjercicio =
+          widget.rentas.where((r) => r.ejercicio == widget.ejercicio).toList();
       final List<IRPFData> rentasEntidad =
-          widget.rentas.where((r) => r.entidad == entidad).toList();
+          rentasEjercicio.where((r) => r.entidad == entidad).toList();
+      /* final List<IRPFData> rentasEntidad =
+          widget.rentas.where((r) => r.entidad == entidad).toList(); */
       for (var renta in rentasEntidad) {
         rendimiento += renta.rendimiento;
         retencion += renta.rentencion;
