@@ -21,7 +21,7 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
   }
 
-  splashTimer() {
+  void splashTimer() {
     Timer(Duration(seconds: 2), () async {
       Navigator.pushReplacement(
           context,

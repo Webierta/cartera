@@ -44,7 +44,7 @@ class _EntidadCardState extends ConsumerState<EntidadCard> {
     super.initState();
   }
 
-  sumarTotalesEntidades() async {
+  Future<void> sumarTotalesEntidades() async {
     final getHistorico = await database.allHistorico;
     if (getHistorico.isEmpty) {
       if (mounted) setState(() => totalEntidades = 0);
@@ -59,7 +59,7 @@ class _EntidadCardState extends ConsumerState<EntidadCard> {
     }
   }
 
-  loadSumas() async {
+  Future<void> loadSumas() async {
     var cuentas = await sumaCuentas;
     var depositos = await sumaDepositos;
     var fondos = await sumaFondos;

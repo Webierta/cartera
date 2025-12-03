@@ -35,7 +35,7 @@ class _DepositosScreenState extends ConsumerState<DepositosScreen> {
     super.initState();
   }
 
-  setNumeroDepositos() async {
+  Future<void> setNumeroDepositos() async {
     final depositos = await database.allDepositos;
     setState(() {
       numeroDepositos = depositos.length;
@@ -190,7 +190,7 @@ class _ListadoDepositosState extends ConsumerState<ListadoDepositos> {
     super.dispose();
   }
 
-  getImposicionTotal() {
+  void getImposicionTotal() {
     double imposicion = 0;
     for (var deposito in widget.depositos) {
       imposicion += deposito.imposicion;

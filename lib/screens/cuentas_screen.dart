@@ -33,7 +33,7 @@ class _CuentasScreenState extends ConsumerState<CuentasScreen> {
     super.initState();
   }
 
-  setNumeroCuentas() async {
+  Future<void> setNumeroCuentas() async {
     final cuentas = await database.allCuentas;
     setState(() {
       numeroCuentas = cuentas.length;

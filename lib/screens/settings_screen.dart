@@ -45,11 +45,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => packageInfo = info);
   }
 
-  initLocalStorage() async {
+  Future<void> initLocalStorage() async {
     await sharedPrefs.init();
   }
 
-  deleteUser() async {
+  Future<void> deleteUser() async {
     //borra usuario y contraseña
     final storage = FlutterSecureStorage();
     String userActivo = sharedPrefs.userActivo;
@@ -61,11 +61,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   }
 
-  copyDb(File file) async {
+  Future<void> copyDb(File file) async {
     await database.exportInto(file);
   }
 
-  cambiarRutaDb(BuildContext context) async {
+  Future<void> cambiarRutaDb(BuildContext context) async {
     try {
       // 1. seleccionar directorio
       final directorio = await FilePicker.platform.getDirectoryPath();

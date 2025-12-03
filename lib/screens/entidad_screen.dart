@@ -85,7 +85,7 @@ class _EntidadScreenState extends ConsumerState<EntidadScreen> {
     setState(() => entidadImposicion[widget.entidad.name] = imposicion);
   }
 
-  getEntidadCapital() async {
+  Future<void> getEntidadCapital() async {
     final fondos = await database.allFondos;
     var fondosEntidad =
         fondos.where((c) => c.entidad == widget.entidad.name).toList();

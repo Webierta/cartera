@@ -35,13 +35,13 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
     super.initState();
   }
 
-  setTitular() {
+  void setTitular() {
     setState(() {
       titularSelect = widget.titular ?? Titular.ambos;
     });
   }
 
-  setEjercicio() {
+  void setEjercicio() {
     setState(() {
       ejercicioSelect = widget.ejercicio;
     });
@@ -60,7 +60,7 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
     }
   }
 
-  loadIRPF() async {
+  Future<void> loadIRPF() async {
     var irpfList = await database.allIRPF;
     if (mounted) {
       setState(() => irpf = irpfList);
@@ -68,7 +68,7 @@ class _IRPFScreenState extends ConsumerState<IRPFScreen> {
     }
   }
 
-  deleteAllIRPF(BuildContext context) async {
+  Future<void> deleteAllIRPF(BuildContext context) async {
     final rentas = await database.allIRPF;
     if (rentas.isEmpty) {
       return;

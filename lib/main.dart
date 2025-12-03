@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  initLocalStorage() async {
+  Future<void> initLocalStorage() async {
     await sharedPrefs.init();
     setState(() => loginRequerido = sharedPrefs.loginRequerido);
   }

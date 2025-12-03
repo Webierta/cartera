@@ -30,7 +30,7 @@ class _AlarmaAddScreenState extends ConsumerState<AlarmaAddScreen> {
     super.initState();
   }
 
-  setEditAlarma() {
+  void setEditAlarma() {
     setState(() {
       fechaController.text =
           FechaUtil.dateToString(date: widget.editAlarma!.fecha);

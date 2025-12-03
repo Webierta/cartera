@@ -25,7 +25,7 @@ class _EntidadDepositosState extends ConsumerState<EntidadDepositos> {
     super.initState();
   }
 
-  loadDepositosEntidad() async {
+  Future<void> loadDepositosEntidad() async {
     final depositos = await database.allDepositos;
     if (mounted) {
       setState(() {

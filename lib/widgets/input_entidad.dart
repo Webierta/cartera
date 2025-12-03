@@ -22,7 +22,7 @@ class _InputEntidadState extends ConsumerState<InputEntidad> {
     super.initState();
   }
 
-  loadEntidades() async {
+  Future<void> loadEntidades() async {
     final database = ref.read(AppDatabase.provider);
     var entidadesList = await database.allEntidades;
     setState(() {

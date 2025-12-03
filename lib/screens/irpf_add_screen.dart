@@ -58,7 +58,7 @@ class _IRPFAddAcreenState extends ConsumerState<IRPFAddScreen> {
     });
   }
 
-  setEditIRPF() {
+  void setEditIRPF() {
     setState(() {
       /* entidad = widget.editIRPF!.entidad;
       codigo = widget.editIRPF!.codigo;

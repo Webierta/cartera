@@ -81,7 +81,7 @@ class _CarteraScreenState extends ConsumerState<CarteraScreen> {
     ); */
   }
 
-  initLocalStorage() async {
+  Future<void> initLocalStorage() async {
     await sharedPrefs.init();
   }
 

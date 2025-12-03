@@ -28,12 +28,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
-  initLocalStorage() async {
+  Future<void> initLocalStorage() async {
     await sharedPrefs.init();
   }
 
   // Registro completado / Acceso autorizado / Acceso denegado
-  messenger({required String msg, required Color color}) {
+  void messenger({required String msg, required Color color}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  regitrar() async {
+  Future<void> regitrar() async {
     await storage
         .write(key: emailController.text, value: passwordController.text)
         .then((e) {
@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  checkLogin() async {
+  Future<void> checkLogin() async {
     var password = await storage.read(key: emailController.text);
     if (password == null) {
       messenger(msg: 'Acceso denegado', color: Colors.red);
@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  recuperarPass() async {
+  Future<void> recuperarPass() async {
     var password = await storage.read(key: emailController.text);
     if (emailController.text.isEmpty) {
       messenger(msg: 'Email requerido', color: Colors.red);

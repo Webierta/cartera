@@ -10,7 +10,7 @@ class LocalStorage {
   static const String _userActivo = 'userActivo';
   //static const String _notas = 'notas';
 
-  init() async {
+  Future<void> init() async {
     pathToFile = await DbTransfer.getDbPath();
     _sharedPrefs ??= await SharedPreferences.getInstance();
   }

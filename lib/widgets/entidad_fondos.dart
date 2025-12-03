@@ -26,7 +26,7 @@ class _EntidadFondosState extends ConsumerState<EntidadFondos> {
     super.initState();
   }
 
-  loadFondosEntidad() async {
+  Future<void> loadFondosEntidad() async {
     final fondos = await database.allFondos;
     if (mounted) {
       setState(() {

@@ -34,7 +34,7 @@ class _FondosScreenState extends ConsumerState<FondosScreen> {
     super.initState();
   }
 
-  setNumeroFondos() async {
+  Future<void> setNumeroFondos() async {
     final fondos = await database.allFondos;
     setState(() => numeroFondos = fondos.length);
   }

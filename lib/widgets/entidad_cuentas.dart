@@ -26,7 +26,7 @@ class _EntidadCuentasState extends ConsumerState<EntidadCuentas> {
     super.initState();
   }
 
-  loadCuentasEntidad() async {
+  Future<void> loadCuentasEntidad() async {
     final cuentas = await database.allCuentas;
     if (mounted) {
       setState(() {
